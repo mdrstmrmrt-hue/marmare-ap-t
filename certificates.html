@@ -1,0 +1,2926 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>نظام توليد شهادات مؤسسة مرمرة التعليمية</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700;800;900&family=Reem+Kufi:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --navy: #0c3144;
+      --navy-dark: #071f2c;
+      --teal: #139a9c;
+      --teal-light: #1bc2c4;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --bg-dark: #0f172a;
+      --panel-bg: #1e293b;
+      --text-light: #f8fafc;
+      --border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* الشريط العلوي المدمج */
+    .top-header {
+      height: 54px;
+      background: linear-gradient(90deg, var(--navy-dark), var(--navy));
+      border-bottom: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      z-index: 200;
+      flex-shrink: 0;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo-mini {
+      width: 36px;
+      height: 36px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .brand-subtitle {
+      font-size: 10px;
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hdr-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+    .hdr-btn:hover { background: rgba(255,255,255,0.2); }
+    .hdr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-export-main {
+      background: linear-gradient(135deg, #d4af37, #b48608);
+      color: #071f2c;
+      border: none;
+      padding: 0 14px;
+      font-weight: 800;
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+    }
+    .btn-export-main:hover { filter: brightness(1.1); }
+
+    .save-badge {
+      font-size: 11px;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.12);
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* الحاوية الرئيسية: شريط جانبي + منطقة عمل المعاينة */
+    .app-body {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* شريط الأزرار الجانبي */
+    .side-rail {
+      width: 68px;
+      background: var(--navy-dark);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 4px;
+      gap: 8px;
+      z-index: 150;
+      flex-shrink: 0;
+    }
+
+    .rail-btn {
+      width: 58px;
+      padding: 8px 2px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #cbd5e1;
+      font-family: 'Cairo', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: 0.2s;
+      text-align: center;
+    }
+    .rail-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .rail-btn:hover, .rail-btn.active {
+      background: rgba(19, 154, 156, 0.25);
+      border-color: var(--teal-light);
+      color: #fff;
+    }
+    .rail-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* الدرج الجانبي المنزلق */
+    .side-drawer {
+      position: absolute;
+      top: 0;
+      right: 68px;
+      bottom: 0;
+      width: 320px;
+      max-width: calc(100vw - 68px);
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(12px);
+      border-left: 1px solid var(--border-color);
+      box-shadow: -8px 0 25px rgba(0,0,0,0.5);
+      z-index: 140;
+      transform: translateX(110%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .side-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.03);
+    }
+    .drawer-header h3 {
+      font-size: 14px;
+      color: var(--gold-light);
+      font-weight: 800;
+    }
+    .close-drawer-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+    }
+
+    .drawer-section {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .drawer-section.active {
+      display: flex;
+    }
+
+    /* عناصر الإدخال داخل الدرج */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .field-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+    .input-ctrl, .select-ctrl, .textarea-ctrl {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+    }
+    .input-ctrl:focus, .select-ctrl:focus, .textarea-ctrl:focus {
+      outline: none;
+      border-color: var(--teal-light);
+    }
+    .textarea-ctrl {
+      min-height: 68px;
+      resize: vertical;
+    }
+
+    /* شبكة القوالب */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tpl-card {
+      background: #0f172a;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+    .tpl-card:hover {
+      border-color: var(--teal-light);
+    }
+    .tpl-card.active {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.12);
+    }
+    .tpl-thumb {
+      width: 100%;
+      height: 64px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    }
+    .tpl-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.3;
+    }
+    .tpl-badge {
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.12);
+      color: var(--gold-light);
+    }
+
+    /* منطقة المعاينة الحية */
+    .workspace-area {
+      flex: 1;
+      background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+      position: relative;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      touch-action: pan-x pan-y;
+    }
+
+    /* غلاف تحجيم الشهادة لحجم A4 */
+    .certificate-scaler {
+      transform-origin: center center;
+      transition: transform 0.15s ease-out;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.65);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* لوحة الشهادة A4 القياسية */
+    .certificate-canvas {
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+      direction: rtl;
+      user-select: none;
+    }
+    .certificate-canvas.landscape {
+      width: 1123px;
+      height: 794px;
+    }
+    .certificate-canvas.portrait {
+      width: 794px;
+      height: 1123px;
+    }
+
+    /* العناصر القابلة للتحريك والتعديل المباشر داخل الشهادة */
+    .cert-item {
+      position: absolute;
+      cursor: grab;
+      z-index: 20;
+      padding: 4px 8px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      touch-action: none;
+    }
+    .cert-item:hover {
+      border-color: rgba(19, 154, 156, 0.45);
+    }
+    .cert-item.selected {
+      border: 2px dashed #139a9c !important;
+      background: rgba(19, 154, 156, 0.04);
+      box-shadow: 0 0 0 4px rgba(19, 154, 156, 0.15);
+      z-index: 60 !important;
+    }
+    .cert-item.locked {
+      cursor: default;
+    }
+    .cert-item.selected.locked {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+
+    /* مقبض التكبير والتصغير المباشر بالزاوية */
+    .resize-handle {
+      display: none;
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: var(--teal);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      bottom: -11px;
+      left: -11px;
+      cursor: nwse-resize;
+      z-index: 70;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+    }
+    .cert-item.selected:not(.locked) .resize-handle {
+      display: flex;
+    }
+
+    /* إخفاء التحديد تماماً عند التصدير */
+    .exporting .cert-item {
+      border-color: transparent !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .exporting .resize-handle {
+      display: none !important;
+    }
+
+    /* شريط التحكم العائم الذكي للعنصر المحدد */
+    .floating-inspector {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 6px 10px;
+      display: none;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      z-index: 130;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      max-width: calc(100% - 20px);
+    }
+    .floating-inspector.visible {
+      display: flex;
+    }
+
+    .insp-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      height: 32px;
+      min-width: 32px;
+      padding: 0 8px;
+      border-radius: 7px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .insp-btn:hover { background: rgba(255,255,255,0.2); }
+    .insp-btn.active { background: var(--teal); border-color: var(--teal-light); }
+
+    .color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .color-dot:hover { transform: scale(1.15); }
+
+    .insp-divider {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,0.18);
+      margin: 0 2px;
+    }
+
+    /* أزرار الزوم العائمة أسفل المعاينة */
+    .zoom-dock {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 30px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 120;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    }
+    .zoom-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .zoom-btn:hover { background: rgba(255,255,255,0.15); }
+    .zoom-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-light);
+      min-width: 44px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* نافذة تعديل النص السريع */
+    .quick-edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .quick-edit-modal.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #1e293b;
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 420px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+
+    @media (max-width: 768px) {
+      .brand-subtitle, .save-badge span { display: none; }
+      .brand-title { font-size: 12px; }
+      .side-rail { width: 58px; }
+      .rail-btn { width: 50px; font-size: 9.5px; padding: 6px 2px; }
+      .side-drawer { right: 58px; width: 290px; max-width: calc(100vw - 58px); }
+      .workspace-area { padding: 10px; }
+      .floating-inspector { top: 6px; padding: 5px 6px; gap: 4px; }
+    }
+  
+    /* خط الإرشاد المغناطيسي لتوسيط العناصر */
+    #centerSnapGuide {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: rgba(212, 175, 55, 0.9);
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.9);
+      z-index: 95;
+      pointer-events: none;
+      display: none;
+    }
+    .hdr-btn.mode-safe {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #10b981;
+      color: #a7f3d0;
+    }
+    .hdr-btn.mode-move {
+      background: rgba(245, 158, 11, 0.28);
+      border-color: #f59e0b;
+      color: #fde68a;
+    }
+
+
+    /* إشعار عائم واضح داخل استوديو الشهادات */
+    #certToast {
+      position: fixed;
+      bottom: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 37, 69, 0.96);
+      color: #fff;
+      border: 1.5px solid var(--gold);
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 12.5px;
+      font-weight: 700;
+      z-index: 999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      display: none;
+      text-align: center;
+      max-width: 90vw;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .top-header {
+        height: auto;
+        min-height: 48px;
+        padding: 6px 8px;
+        justify-content: center;
+      }
+      .brand-box, .save-badge { display: none !important; }
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .hdr-btn {
+        height: 32px;
+        padding: 0 8px;
+        font-size: 11px;
+        border-radius: 7px;
+      }
+      .hdr-btn .hide-sm { display: none; }
+      .btn-export-main { padding: 0 10px; }
+      .side-rail { width: 52px; padding: 6px 2px; gap: 6px; }
+      .rail-btn { width: 46px; font-size: 9px; padding: 6px 2px; }
+      .side-drawer { right: 52px; width: 280px; max-width: calc(100vw - 52px); }
+      .workspace-area { padding: 8px; align-items: center; justify-content: center; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- الشريط العلوي -->
+  <header class="top-header">
+    <div class="brand-box">
+      <div class="brand-logo-mini" id="miniHeaderLogo"></div>
+      <div>
+        <div class="brand-title">مؤسسة مرمرة التعليمية</div>
+        <span class="brand-subtitle">استوديو تصميم وتصدير الشهادات الاحترافي</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="save-badge" id="saveStatusBadge" title="يتم حفظ جميع التعديلات تلقائياً">
+        ● <span>محفوظ تلقائياً</span>
+      </div>
+      <button class="hdr-btn mode-safe" id="moveModeBtn" onclick="toggleGlobalMoveMode()" title="التبديل بين الوضع الآمن لمنع التحريك بالخطأ ووضع تحريك العناصر">🔒 آمن</button>
+      <button class="hdr-btn" id="undoBtn" onclick="undoState()" title="تراجع">↶</button>
+      <button class="hdr-btn" id="redoBtn" onclick="redoState()" title="إعادة">↷</button>
+      <button class="hdr-btn" onclick="openBatchModal()" title="طباعة شهادات لعدة طلاب دفعة واحدة">🖨️ <span class="hide-sm">طباعة جماعية</span></button>
+      <button class="hdr-btn" style="background:#16a34a;border-color:#15803d" onclick="exportCertificate(true)" title="مشاركة عبر واتساب">📲 <span class="hide-sm">واتساب</span></button>
+      <button class="hdr-btn btn-export-main" onclick="exportCertificate(false)">⬇ حفظ</button>
+    </div>
+  </header>
+
+  <!-- جسم التطبيق -->
+  <div class="app-body">
+    <!-- شريط الأزرار الجانبي -->
+    <nav class="side-rail">
+      <button class="rail-btn" data-panel="templates" onclick="toggleDrawer('templates')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span>القوالب</span>
+      </button>
+
+      <button class="rail-btn" data-panel="texts" onclick="toggleDrawer('texts')">
+        <svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+        <span>النصوص</span>
+      </button>
+
+      <button class="rail-btn" data-panel="elements" onclick="toggleDrawer('elements')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <span>العناصر</span>
+      </button>
+
+      <button class="rail-btn" data-panel="style" onclick="toggleDrawer('style')">
+        <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        <span>الخط واللون</span>
+      </button>
+
+      <button class="rail-btn danger" onclick="confirmResetTemplate()" style="margin-top:auto;" title="إعادة الضبط إلى التصميم الأصلي">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>إعادة ضبط</span>
+      </button>
+    </nav>
+
+    <!-- الدرج الجانبي المنزلق -->
+    <aside class="side-drawer" id="sideDrawer">
+      <div class="drawer-header">
+        <h3 id="drawerTitle">القوالب الجاهزة</h3>
+        <button class="close-drawer-btn" onclick="closeDrawer()">✕</button>
+      </div>
+
+      <div class="drawer-content">
+        <!-- 1. قسم القوالب -->
+        <div class="drawer-section active" id="panel-templates">
+          <div class="field-group">
+            <label>اتجاه الشهادة (حجم A4 القياسي):</label>
+            <div style="display:flex; gap:6px;">
+              <button class="hdr-btn" style="flex:1; justify-content:center;" id="btnOrientLand" onclick="setOrientation('landscape')">↔ أفقي (A4)</button>
+              <button class="hdr-btn" style="flex:1; justify-content:center;" id="btnOrientPort" onclick="setOrientation('portrait')">↕ عمودي (A4)</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>نوع المخطوطة (العنوان الرئيسي):</label>
+            <select class="select-ctrl" id="calligraphySelect" onchange="changeCalligraphyType(this.value)">
+              <option value="وسام التميز">وسام التميز</option>
+              <option value="شهادة فخر">شهادة فخر</option>
+              <option value="شكر وتقدير">شكر وتقدير</option>
+              <option value="شهادة تقدير">شهادة تقدير</option>
+              <option value="شهادة تقدير وتفوق">شهادة تقدير وتفوق</option>
+              <option value="شهادة شكر وتقدير">شهادة شكر وتقدير</option>
+              <option value="شهادة تهنئة">شهادة تهنئة</option>
+              <option value="ثناء">شهادة ثناء</option>
+              <option value="نجم الأسبوع">نجم الأسبوع</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>اختر تصميم الشهادة (11 قالباً احترافياً):</label>
+            <div class="templates-grid" id="templatesGrid"></div>
+          </div>
+
+          <div class="field-group" style="margin-top:8px; border-top:1px solid var(--border-color); padding-top:10px;">
+            <label>رفع صورة خلفية خارجية (اختياري):</label>
+            <input type="file" accept="image/*" class="input-ctrl" onchange="uploadCustomBg(event)" />
+          </div>
+        </div>
+
+        <!-- 2. قسم النصوص السريعة -->
+        <div class="drawer-section" id="panel-texts">
+          <div style="background:rgba(19,154,156,0.15); border:1px solid var(--teal-light); border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:7px;">
+            <label style="font-size:12px; font-weight:800; color:var(--gold-light);">🎓 سحب طالب تلقائياً من سجل المدرسة:</label>
+            <select class="select-ctrl" id="dbSecSelect" onchange="populateDbStudents()">
+              <option value="">-- اختر الشعبة --</option>
+            </select>
+            <select class="select-ctrl" id="dbStuSelect" onchange="applyDbStudent(this.value)">
+              <option value="">-- اختر الطالب --</option>
+            </select>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:8px; padding:8px;">
+            <label style="font-size:11.5px; font-weight:700; color:#cbd5e1; display:block; margin-bottom:5px;">⚡ عبارات تكريم جاهزة (بضغطة زر):</label>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+              <button type="button" class="hdr-btn" style="height:28px;font-size:11px;" onclick="setPresetReason('تقديراً لتفوقه/ا الدراسي واجتهاده/ا المتميز خلال الشهر، متمنين له/ا دوام التقدم والنجاح.')">تفوق دراسي</button>
+              <button type="button" class="hdr-btn" style="height:28px;font-size:11px;" onclick="setPresetReason('تقديراً لالتزامه/ا بالانضباط وحسن السلوك والأخلاق الحميدة داخل الصف والمدرسة.')">انضباط وسلوك</button>
+              <button type="button" class="hdr-btn" style="height:28px;font-size:11px;" onclick="setPresetReason('تقديراً لمشاركته/ا الفاعلة ونشاطه/ا المميز وتعاونه/ا المثمر مع المعلمين والزملاء.')">نشاط ومشاركة</button>
+              <button type="button" class="hdr-btn" style="height:28px;font-size:11px;" onclick="setPresetReason('تقديراً لتميزه/ا في الحفظ والإتقان والمثابرة المستمرة، بارك الله في جهوده/ا.')">حفظ وتميز</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>اسم الطالب / المعلم (المُهدى إليه):</label>
+            <input type="text" class="input-ctrl" id="inpRecipient" oninput="updateQuickField('recipient', this.value)" placeholder="مثال: الطالبة آلاء الحسن" />
+          </div>
+
+          <div class="field-group">
+            <label>مقدمة التكريم / الجهة المانحة:</label>
+            <textarea class="textarea-ctrl" id="inpIntro" oninput="updateQuickField('intro', this.value)"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label>سبب التكريم / المادة / الصف:</label>
+            <textarea class="textarea-ctrl" id="inpReason" oninput="updateQuickField('reason', this.value)"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label>اسم المدير / إدارة المدرسة:</label>
+            <input type="text" class="input-ctrl" id="inpManager" oninput="updateQuickField('manager', this.value)" />
+          </div>
+
+          <div class="field-group">
+            <label>التاريخ / الشريط التشجيعي:</label>
+            <input type="text" class="input-ctrl" id="inpDate" oninput="updateQuickField('date', this.value)" />
+          </div>
+
+          <button class="hdr-btn" style="width:100%; justify-content:center; background:var(--teal); margin-top:6px;" onclick="addNewTextElement()">
+            + إضافة نص جديد حر للشهادة
+          </button>
+        </div>
+
+        <!-- 3. قسم العناصر والشعار والرسومات -->
+        <div class="drawer-section" id="panel-elements">
+          <p style="font-size:11px; color:#cbd5e1;">
+            كل عنصر في الشهادة (شعار، نجمة التميز، وسام، قبعة تخرج، شخصية كرتونية) قابل للسحب والتحريك والتكبير باليد أو الماوس.
+          </p>
+
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addNewTextElement()">+ إضافة سطر نصي جديد</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('starRibbon3D')">⭐ إضافة نجمة وسام التميز 3D</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('threeGoldStars')">✨ إضافة النجوم الثلاث الذهبية</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('gradBoy')">🎓 إضافة شخصية الخريج</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('gradCap2027')">🎓 إضافة قبعة تخرج 2027</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('winnerMedal')">🏅 إضافة وسام التفوق الذهبي</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center; border-color:var(--gold);" onclick="addMovableSticker('officialStamp')">🏛️ إضافة ختم المدرسة الرسمي</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('medalIdeal')">🥇 وسام الطالب المثالي</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('medalReader')">📖 وسام بطل القراءة</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('medalMental')">🧮 وسام نجم الحساب الذهني</button>
+          <button class="hdr-btn" style="width:100%; justify-content:center;" onclick="addMovableSticker('medalEthics')">🌟 وسام سفير الأخلاق</button>
+
+          <div class="field-group" style="margin-top:8px; border-top:1px solid var(--border-color); padding-top:10px;">
+            <label>تغيير صورة الشعار (اختياري):</label>
+            <input type="file" accept="image/*" class="input-ctrl" onchange="uploadCustomLogo(event)" />
+            <button class="hdr-btn" style="justify-content:center; margin-top:4px;" onclick="restoreOriginalLogo()">استعادة شعار مرمرة الأصلي</button>
+          </div>
+        </div>
+
+        <!-- 4. قسم الخط واللون للعنصر المحدد -->
+        <div class="drawer-section" id="panel-style">
+          <div class="field-group">
+            <label>نوع الخط العربي:</label>
+            <select class="select-ctrl" id="fontFamilySelect" onchange="setSelectedFont(this.value)">
+              <option value="'Cairo', sans-serif">خط القاهرة العصري (Cairo)</option>
+              <option value="'Tajawal', sans-serif">خط تجوال (Tajawal)</option>
+              <option value="'Amiri', serif">الخط الأميري الكلاسيكي (Amiri)</option>
+              <option value="'Aref Ruqaa', serif">خط الرقعة (Aref Ruqaa)</option>
+              <option value="'Reem Kufi', sans-serif">الخط الكوفي (Reem Kufi)</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>حجم العنصر / الخط المحدد:</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="hdr-btn" style="flex:1; justify-content:center;" onclick="scaleSelectedElement(-0.08)">تصغير (-)</button>
+              <button class="hdr-btn" style="flex:1; justify-content:center;" onclick="scaleSelectedElement(0.08)">تكبير (+)</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>لون النص المحدد:</label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <div class="color-dot" style="background:#0c3144;" onclick="setSelectedColor('#0c3144')"></div>
+              <div class="color-dot" style="background:#139a9c;" onclick="setSelectedColor('#139a9c')"></div>
+              <div class="color-dot" style="background:#b48608;" onclick="setSelectedColor('#b48608')"></div>
+              <div class="color-dot" style="background:#111827;" onclick="setSelectedColor('#111827')"></div>
+              <div class="color-dot" style="background:#ffffff;" onclick="setSelectedColor('#ffffff')"></div>
+              <div class="color-dot" style="background:#991b1b;" onclick="setSelectedColor('#991b1b')"></div>
+              <input type="color" id="customColorPicker" onchange="setSelectedColor(this.value)" style="width:32px; height:32px; border:none; background:none; cursor:pointer;" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>تحريك دقيق للعنصر المحدد:</label>
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+              <button class="hdr-btn" style="justify-content:center;" onclick="nudgeSelected(0, -6)">⬆</button>
+              <button class="hdr-btn" style="justify-content:center;" onclick="nudgeSelected(0, 6)">⬇</button>
+              <button class="hdr-btn" style="justify-content:center;" onclick="nudgeSelected(6, 0)">➡</button>
+              <button class="hdr-btn" style="justify-content:center;" onclick="nudgeSelected(-6, 0)">⬅</button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="hdr-btn" style="flex:1; justify-content:center;" onclick="toggleLockSelected()" id="lockBtnDrawer">🔒 قفل العنصر</button>
+            <button class="hdr-btn" style="flex:1; justify-content:center;" onclick="resetSingleSelected()">↺ ضبط العنصر</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- منطقة المعاينة الرئيسية (الشهادة بحجم A4) -->
+    <main class="workspace-area" id="workspaceArea" onclick="handleWorkspaceBackgroundClick(event)">
+      
+      <!-- شريط الأدوات العائم عند تحديد أي عنصر على الشهادة -->
+      <div class="floating-inspector" id="floatingInspector" onclick="event.stopPropagation()">
+        <button class="insp-btn" id="btnQuickEditText" onclick="openQuickTextModal()" title="تعديل النص">✎ نص</button>
+        <button class="insp-btn" onclick="centerSelectedHorizontally()" title="توسيط العنصر في منتصف الشهادة">↔ توسيط</button>
+        <button class="insp-btn" onclick="nudgeSelected(0, -6)" title="أعلى">⬆</button>
+        <button class="insp-btn" onclick="nudgeSelected(0, 6)" title="أسفل">⬇</button>
+        <button class="insp-btn" onclick="nudgeSelected(6, 0)" title="يمين">➡</button>
+        <button class="insp-btn" onclick="nudgeSelected(-6, 0)" title="يسار">⬅</button>
+        <button class="insp-btn" onclick="scaleSelectedElement(0.08)" title="تكبير">A+</button>
+        <button class="insp-btn" onclick="scaleSelectedElement(-0.08)" title="تصغير">A-</button>
+        <div class="insp-divider"></div>
+        <div class="color-dot" style="background:#0c3144;" onclick="setSelectedColor('#0c3144')" title="كحلي مرمرة"></div>
+        <div class="color-dot" style="background:#139a9c;" onclick="setSelectedColor('#139a9c')" title="فيروزي مرمرة"></div>
+        <div class="color-dot" style="background:#b48608;" onclick="setSelectedColor('#b48608')" title="ذهبي"></div>
+        <div class="color-dot" style="background:#1e293b;" onclick="setSelectedColor('#1e293b')" title="أسود داكن"></div>
+        <div class="color-dot" style="background:#ffffff;" onclick="setSelectedColor('#ffffff')" title="أبيض"></div>
+        <input type="color" onchange="setSelectedColor(this.value)" style="width:24px; height:24px; border:none; background:none; padding:0; cursor:pointer;" title="لون مخصص" />
+        <div class="insp-divider"></div>
+        <select class="select-ctrl" style="width:auto; height:30px; padding:2px 6px; font-size:11px;" id="floatingFontSelect" onchange="setSelectedFont(this.value)">
+          <option value="'Cairo', sans-serif">Cairo</option>
+          <option value="'Amiri', serif">Amiri</option>
+          <option value="'Aref Ruqaa', serif">رقعة</option>
+          <option value="'Tajawal', sans-serif">Tajawal</option>
+          <option value="'Reem Kufi', sans-serif">كوفي</option>
+        </select>
+        <button class="insp-btn" onclick="toggleLockSelected()" id="floatingLockBtn" title="قفل أو فتح تحريك العنصر">🔓</button>
+        <button class="insp-btn" onclick="resetSingleSelected()" title="إعادة العنصر لمكانه الأصلي">↺</button>
+        <button class="insp-btn" style="color:#fca5a5;" onclick="deleteSelectedElement()" title="حذف العنصر">🗑</button>
+      </div>
+
+      <!-- حاوية تحجيم الشهادة -->
+      <div class="certificate-scaler" id="certScaler">
+        <div class="certificate-canvas landscape" id="certificateCanvas">
+          <!-- الخلفية الرسومية للقالب المختار -->
+          <div id="templateBgLayer" style="position:absolute; inset:0; pointer-events:none; z-index:1;"></div>
+          <!-- العناصر التفاعلية القابلة للتحريك -->
+          <div id="centerSnapGuide"></div>
+          <div id="interactiveElementsLayer" style="position:absolute; inset:0; z-index:10;"></div>
+        </div>
+      </div>
+
+      <!-- شريط الزوم والتحجيم أسفل الشاشة -->
+      <div class="zoom-dock" onclick="event.stopPropagation()">
+        <button class="zoom-btn" onclick="changeZoom(-0.08)" title="تصغير العرض">−</button>
+        <span class="zoom-label" id="zoomPercentLabel" onclick="fitCertificateToScreen()" title="اضغط لملائمة الشاشة تلقائياً">100%</span>
+        <button class="zoom-btn" onclick="changeZoom(0.08)" title="تكبير العرض">+</button>
+        <button class="insp-btn" style="height:26px; font-size:11px;" onclick="fitCertificateToScreen()">ملائمة A4</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- نافذة تعديل النص المباشر -->
+  <div class="quick-edit-modal" id="quickEditModal" onclick="closeQuickTextModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="color:var(--gold-light); font-size:14px;">تعديل النص المحدد</h4>
+        <button class="close-drawer-btn" onclick="closeQuickTextModal()">✕</button>
+      </div>
+      <textarea class="textarea-ctrl" id="modalTextInput" style="min-height:100px; font-size:15px;"></textarea>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button class="hdr-btn" onclick="closeQuickTextModal()">إلغاء</button>
+        <button class="hdr-btn btn-export-main" onclick="saveQuickTextModal()">حفظ التعديل</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- نافذة الإصدار والطباعة الجماعية لعدة طلاب -->
+  <div class="quick-edit-modal" id="batchPrintModal" onclick="closeBatchModal()">
+    <div class="modal-card" style="max-width:560px; max-height:88vh; overflow-y:auto;" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="color:var(--gold-light); font-size:15px;">🖨️ طباعة شهادات جماعية (PDF A4)</h4>
+        <button class="close-drawer-btn" onclick="closeBatchModal()">✕</button>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="hdr-btn" id="batchTabBtn_sec" style="flex:1;justify-content:center;background:var(--teal);" onclick="switchBatchMode('sec')">🎓 اختيار من الشعبة / الأوائل</button>
+        <button type="button" class="hdr-btn" id="batchTabBtn_excel" style="flex:1;justify-content:center;" onclick="switchBatchMode('excel')">📋 لصق من Excel (سبب مخصص)</button>
+      </div>
+
+      <div id="batchPane_sec" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="field-group">
+          <label>الشعبة:</label>
+          <select class="select-ctrl" id="batchSecSelect" onchange="renderBatchStudentsList()"></select>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button type="button" class="hdr-btn" style="flex:1;justify-content:center;border-color:var(--gold);color:var(--gold-light);" onclick="requestTopStudentsForBatch()">🏅 استخراج أوائل الشعبة (5)</button>
+          <button type="button" class="hdr-btn" style="justify-content:center;" onclick="toggleAllBatchChecks(true)">تحديد الكل</button>
+          <button type="button" class="hdr-btn" style="justify-content:center;" onclick="toggleAllBatchChecks(false)">مسح</button>
+        </div>
+        <div id="batchStudentsBox" style="max-height:220px; overflow-y:auto; background:#0f172a; border:1px solid var(--border-color); border-radius:8px; padding:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px;"></div>
+      </div>
+
+      <div id="batchPane_excel" style="display:none;flex-direction:column;gap:8px;">
+        <p style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">الصق من جدول Excel عمودين: <b>اسم الطالب</b> ثم <b>سبب التكريم الخاص به</b> (مفصولين بـ Tab أو |) لتوليد شهادة مخصصة لكل طالب:</p>
+        <textarea class="textarea-ctrl" id="batchExcelTextarea" style="min-height:140px;font-size:12.5px;" placeholder="أحمد محمد العلي	تقديراً لحصوله على المركز الأول في الرياضيات&#10;سارة خالد الحسن	تقديراً لتميزها في القراءة والانضباط"></textarea>
+      </div>
+
+      <div id="batchProgressMsg" style="font-size:12px; color:#4ade80; font-weight:700; min-height:18px;"></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button type="button" class="hdr-btn" onclick="closeBatchModal()">إلغاء</button>
+        <button type="button" class="hdr-btn btn-export-main" id="btnRunBatchPrint" onclick="runBatchPrint()">🖨️ تجهيز وطباعة الشهادات</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="certToast"></div>
+
+  <script>
+    /********************************************************************
+     * 1. الشعار الأصلي لمؤسسة مرمرة (MARMARA) والملصقات الرسومية
+     ********************************************************************/
+    function getOriginalMarmaraLogoSVG(mode = 'original') {
+      if (state && state.customLogoDataUrl) {
+        return `<img src="${state.customLogoDataUrl}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" />`;
+      }
+      let navy = '#0e475d';
+      let teal = '#139a9c';
+      if (mode === 'gold') {
+        navy = '#c59b27';
+        teal = '#e6c55a';
+      } else if (mode === 'silver') {
+        navy = '#e2e8f0';
+        teal = '#ffffff';
+      } else if (mode === 'white') {
+        navy = '#ffffff';
+        teal = '#e2e8f0';
+      }
+
+      return `
+      <svg viewBox="0 0 472 417" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display:block; pointer-events:none;">
+        <polygon points="201,59 236,110 271,59 273,62 236,116 199,62" fill="${teal}" />
+        <polygon points="188,62 236,123 284,62 287,65 236,130 185,65" fill="${navy}" />
+        <polygon points="179,67 236,137 293,67 293,200 275,217 275,112 236,161 197,112 197,217 179,200" fill="${teal}" />
+        <polygon points="229,159 236,168 243,159 243,235 229,235" fill="${navy}" />
+        <polygon points="229,238 243,238 236,250" fill="${teal}" />
+        <path d="M 149,70 L 158,80 L 158,198 Q 184,209 208,231 Q 178,217 149,206 Z" fill="${navy}" />
+        <path d="M 323,70 L 314,80 L 314,198 Q 288,209 264,231 Q 294,217 323,206 Z" fill="${navy}" />
+        <polygon points="132,90 141,100 141,204 132,203" fill="${navy}" />
+        <polygon points="340,90 331,100 331,204 340,203" fill="${navy}" />
+        <path d="M 132,212 Q 182,217 231,261 Q 186,232 148,225 Z" fill="${navy}" />
+        <path d="M 340,212 Q 290,217 241,261 Q 286,232 324,225 Z" fill="${navy}" />
+        <path d="M 153,236 Q 194,240 232,268 Q 198,252 168,249 Z" fill="${teal}" />
+        <path d="M 319,236 Q 278,240 240,268 Q 274,252 304,249 Z" fill="${teal}" />
+        <g fill="${navy}">
+          <polygon points="82,332 82,282 93,282 110,312 127,282 138,282 138,332 128,332 128,298 110,328 92,298 92,332" />
+          <path d="M 157,282 L 168,282 L 187,332 L 176,332 L 172,320 L 152,320 L 148,332 L 139,332 Z M 155,311 L 169,311 L 162,293 Z" />
+          <path d="M 191,282 L 214,282 C 224,282 230,287 230,296 C 230,303 226,308 219,310 L 232,332 L 220,332 L 209,311 L 201,311 L 201,332 L 191,332 Z M 201,303 L 212,303 C 217,303 220,300 220,296 C 220,292 217,290 212,290 L 201,290 Z" />
+          <polygon points="237,332 237,282 248,282 265,312 282,282 293,282 293,332 283,332 283,298 265,328 247,298 247,332" />
+          <path d="M 312,282 L 323,282 L 342,332 L 331,332 L 327,320 L 307,320 L 303,332 L 294,332 Z M 310,311 L 324,311 L 317,293 Z" />
+          <path d="M 346,282 L 369,282 C 379,282 385,287 385,296 C 385,303 381,308 374,310 L 387,332 L 375,332 L 364,311 L 356,311 L 356,332 L 346,332 Z M 356,303 L 367,303 C 372,303 375,300 375,296 C 375,292 372,290 367,290 L 356,290 Z" />
+          <path d="M 404,282 L 415,282 L 434,332 L 423,332 L 419,320 L 399,320 L 395,332 L 386,332 Z M 402,311 L 416,311 L 409,293 Z" />
+        </g>
+      </svg>`;
+    }
+
+    function getStickerSVG(stickerType, extraText = '') {
+      switch (stickerType) {
+        // نجمة وسام التميز الثلاثية الأبعاد مع الشرائط المتدلية (أعلى اليمين في قالب وسام التميز)
+        case 'starRibbon3D':
+          return `
+          <svg viewBox="0 0 290 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <defs>
+              <linearGradient id="goldStarMain" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fffbeb"/>
+                <stop offset="35%" stop-color="#fde047"/>
+                <stop offset="70%" stop-color="#d97706"/>
+                <stop offset="100%" stop-color="#78350f"/>
+              </linearGradient>
+              <linearGradient id="ribbonTealGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#139a9c"/>
+                <stop offset="50%" stop-color="#0a4f5c"/>
+                <stop offset="100%" stop-color="#04242c"/>
+              </linearGradient>
+              <filter id="starDrop3D" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="-4" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.45"/>
+              </filter>
+            </defs>
+            <g filter="url(#starDrop3D)">
+              <!-- الشرائط الفيروزية والذهبية المتدلية خلف النجمة -->
+              <path d="M 95,135 L 42,272 L 78,248 L 96,282 L 135,148 Z" fill="url(#ribbonTealGrad)" stroke="#fde047" stroke-width="3"/>
+              <path d="M 145,140 L 178,318 L 208,278 L 245,296 L 195,125 Z" fill="url(#ribbonTealGrad)" stroke="#fde047" stroke-width="3.5"/>
+              <!-- النجمة الذهبية الخماسية البارزة ثلاثية الأبعاد -->
+              <polygon points="145,12 176,82 252,90 194,140 210,214 145,175 80,214 96,140 38,90 114,82" fill="url(#goldStarMain)" stroke="#fef08a" stroke-width="3" stroke-linejoin="round"/>
+              <!-- تظليل الأوجه الثلاثية الأبعاد للنجمة -->
+              <polygon points="145,12 145,118 176,82" fill="#fef9c3" opacity="0.75"/>
+              <polygon points="145,118 252,90 194,140" fill="#b45309" opacity="0.55"/>
+              <polygon points="145,118 210,214 145,175" fill="#92400e" opacity="0.6"/>
+              <polygon points="145,118 80,214 96,140" fill="#d97706" opacity="0.45"/>
+              <polygon points="145,118 38,90 114,82" fill="#fde047" opacity="0.65"/>
+            </g>
+          </svg>`;
+
+        // النجوم الذهبية الثلاث في أعلى منتصف قالب وسام التميز
+        case 'threeGoldStars':
+          return `
+          <svg viewBox="0 0 320 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <defs>
+              <linearGradient id="sGold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="55%" stop-color="#eab308"/>
+                <stop offset="100%" stop-color="#a16207"/>
+              </linearGradient>
+              <filter id="sGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.35"/>
+              </filter>
+            </defs>
+            <g filter="url(#sGlow)">
+              <!-- نجمة صغيرة يسار -->
+              <polygon points="32,75 36,84 46,85 38,91 40,101 32,96 24,101 26,91 18,85 28,84" fill="url(#sGold)"/>
+              <!-- نجمة متوسطة يسار -->
+              <polygon points="88,42 98,64 122,67 104,83 109,107 88,95 67,107 72,83 54,67 78,64" fill="url(#sGold)" stroke="#fef9c3" stroke-width="1.5"/>
+              <!-- النجمة الكبرى في الوسط -->
+              <polygon points="165,8 180,42 216,46 189,70 196,106 165,88 134,106 141,70 114,46 150,42" fill="url(#sGold)" stroke="#ffffff" stroke-width="2"/>
+              <!-- نجمة متوسطة يمين -->
+              <polygon points="242,42 252,64 276,67 258,83 263,107 242,95 221,107 226,83 208,67 232,64" fill="url(#sGold)" stroke="#fef9c3" stroke-width="1.5"/>
+            </g>
+          </svg>`;
+
+        case 'gradCap2027':
+          const yearStr = (extraText || '2027').replace(/\s+/g, '');
+          const d0 = yearStr[0] || '2';
+          const d1 = yearStr[1] || '0';
+          const d2 = yearStr[2] || '2';
+          const d3 = yearStr[3] || '7';
+          return `
+          <svg viewBox="0 0 220 560" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <defs>
+              <filter id="numShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="4" dy="6" stdDeviation="2" flood-color="#000000" flood-opacity="0.85"/>
+              </filter>
+              <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#334155"/>
+                <stop offset="50%" stop-color="#0f172a"/>
+                <stop offset="100%" stop-color="#020617"/>
+              </linearGradient>
+            </defs>
+            <polygon points="110,12 212,56 110,100 8,56" fill="url(#capGrad)" stroke="#ffffff" stroke-width="2.5"/>
+            <polygon points="110,20 194,56 110,92 26,56" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <path d="M 52,76 L 52,122 Q 110,100 168,122 L 168,76 Q 110,98 52,76 Z" fill="url(#capGrad)" stroke="#ffffff" stroke-width="2"/>
+            <path d="M 56,112 Q 110,92 164,112" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+            <circle cx="110" cy="56" r="6" fill="#f59e0b"/>
+            <path d="M 110,56 Q 60,68 32,90 L 32,135" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="32,128 21,165 43,165" fill="#f59e0b"/>
+            <g font-family="'Cairo', sans-serif" font-weight="900" font-size="112" text-anchor="middle" fill="#ffffff" stroke="#0f172a" stroke-width="10" paint-order="stroke fill" filter="url(#numShadow)">
+              <text x="112" y="212">${d0}</text>
+              <text x="112" y="318">${d1}</text>
+              <text x="112" y="424">${d2}</text>
+              <text x="112" y="530">${d3}</text>
+            </g>
+          </svg>`;
+
+        case 'gradBoy':
+          return `
+          <svg viewBox="0 0 280 390" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <defs>
+              <radialGradient id="skinGrad" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#ffedd5"/>
+                <stop offset="75%" stop-color="#fed7aa"/>
+                <stop offset="100%" stop-color="#fdba74"/>
+              </radialGradient>
+              <linearGradient id="gownGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#334155"/>
+                <stop offset="45%" stop-color="#1e293b"/>
+                <stop offset="100%" stop-color="#090d16"/>
+              </linearGradient>
+              <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3b2314"/>
+                <stop offset="100%" stop-color="#170d07"/>
+              </linearGradient>
+              <filter id="softDrop" x="-15%" y="-15%" width="130%" height="130%">
+                <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.28"/>
+              </filter>
+            </defs>
+            <g filter="url(#softDrop)">
+              <ellipse cx="140" cy="368" rx="68" ry="14" fill="rgba(15,23,42,0.22)"/>
+              <rect x="98" y="338" width="32" height="26" rx="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+              <ellipse cx="108" cy="345" rx="7" ry="3" fill="rgba(255,255,255,0.35)"/>
+              <rect x="150" y="338" width="32" height="26" rx="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+              <ellipse cx="160" cy="345" rx="7" ry="3" fill="rgba(255,255,255,0.35)"/>
+              <path d="M 92,208 L 72,340 L 208,340 L 188,208 Z" fill="url(#gownGrad)" stroke="#0f172a" stroke-width="2.5"/>
+              <path d="M 118,215 L 110,340 M 162,215 L 170,340" stroke="rgba(255,255,255,0.12)" stroke-width="3"/>
+              <polygon points="122,204 158,204 140,236" fill="#ffffff"/>
+              <polygon points="136,212 144,212 146,238 140,245 134,238" fill="#dc2626"/>
+              <path d="M 105,206 L 140,244 L 175,206" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+              <path d="M 94,212 Q 62,245 76,278 L 112,268 Q 102,242 108,218 Z" fill="url(#gownGrad)"/>
+              <path d="M 186,212 Q 218,245 202,282 L 166,272 Q 178,242 172,218 Z" fill="url(#gownGrad)"/>
+              <g transform="rotate(-28 158 272)">
+                <rect x="122" y="256" width="84" height="24" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                <ellipse cx="124" cy="268" rx="4" ry="10" fill="#cbd5e1"/>
+                <rect x="156" y="255" width="12" height="26" rx="2" fill="#ef4444"/>
+                <path d="M 162,280 L 154,296 M 162,280 L 170,296" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+              </g>
+              <circle cx="108" cy="266" r="13" fill="url(#skinGrad)" stroke="#d97706" stroke-width="1"/>
+              <circle cx="172" cy="276" r="13" fill="url(#skinGrad)" stroke="#d97706" stroke-width="1"/>
+              <circle cx="75" cy="156" r="14" fill="url(#skinGrad)"/>
+              <circle cx="205" cy="156" r="14" fill="url(#skinGrad)"/>
+              <rect x="128" y="192" width="24" height="20" rx="8" fill="url(#skinGrad)"/>
+              <rect x="78" y="88" width="124" height="114" rx="56" fill="url(#skinGrad)" stroke="#e2a76f" stroke-width="1.5"/>
+              <ellipse cx="102" cy="166" rx="12" ry="7" fill="#fb7185" opacity="0.38"/>
+              <ellipse cx="178" cy="166" rx="12" ry="7" fill="#fb7185" opacity="0.38"/>
+              <g>
+                <ellipse cx="112" cy="148" rx="15" ry="17" fill="#ffffff"/>
+                <ellipse cx="113" cy="149" rx="12" ry="14" fill="#291709"/>
+                <ellipse cx="113" cy="151" rx="8" ry="9" fill="#090502"/>
+                <circle cx="108" cy="143" r="4.5" fill="#ffffff"/>
+                <circle cx="118" cy="155" r="2.2" fill="#ffffff"/>
+                <path d="M 94,136 Q 112,126 128,138" fill="none" stroke="#170d07" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 98,125 Q 112,119 125,126" fill="none" stroke="#3b2314" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="168" cy="148" rx="15" ry="17" fill="#ffffff"/>
+                <ellipse cx="167" cy="149" rx="12" ry="14" fill="#291729"/>
+                <ellipse cx="167" cy="151" rx="8" ry="9" fill="#090502"/>
+                <circle cx="162" cy="143" r="4.5" fill="#ffffff"/>
+                <circle cx="172" cy="155" r="2.2" fill="#ffffff"/>
+                <path d="M 152,138 Q 168,126 186,136" fill="none" stroke="#170d07" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 155,126 Q 168,119 182,125" fill="none" stroke="#3b2314" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              <path d="M 138,158 Q 140,162 143,158" fill="none" stroke="#c27848" stroke-width="2" stroke-linecap="round"/>
+              <path d="M 126,171 Q 140,188 154,171 Z" fill="#e11d48" stroke="#881337" stroke-width="1.5"/>
+              <path d="M 131,178 Q 140,185 149,178 Z" fill="#fda4af"/>
+              <path d="M 76,138 Q 74,95 140,86 Q 206,95 204,138 Q 192,110 172,122 Q 158,104 136,124 Q 115,104 96,124 Q 84,114 76,138 Z" fill="url(#hairGrad)"/>
+              <path d="M 78,92 Q 140,70 202,92 L 196,114 Q 140,94 84,114 Z" fill="url(#gownGrad)" stroke="#020617" stroke-width="2"/>
+              <polygon points="140,22 258,64 140,104 22,64" fill="url(#gownGrad)" stroke="#475569" stroke-width="2.5"/>
+              <circle cx="140" cy="63" r="5" fill="#fbbf24"/>
+              <path d="M 140,63 Q 195,72 232,92 L 236,138" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+              <polygon points="236,132 227,158 245,158" fill="#d97706"/>
+            </g>
+          </svg>`;
+
+        case 'congratsBoy':
+          return `
+          <svg viewBox="0 0 290 390" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <rect x="14" y="14" width="262" height="362" rx="48" fill="#ffffff" stroke="#0f172a" stroke-width="3" stroke-dasharray="8 6"/>
+            <g transform="translate(5, 0)">
+              ${getStickerSVG('gradBoy')}
+              <path d="M 106,208 L 140,262 L 174,208" fill="none" stroke="#fbbf24" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="140" cy="272" r="14" fill="#fbbf24" stroke="#b45309" stroke-width="2.5"/>
+              <polygon points="140,263 143,269 149,270 144,274 146,280 140,277 134,280 136,274 131,270 137,269" fill="#fffbeb"/>
+              <g transform="translate(56, 224) rotate(-18)">
+                <polygon points="22,36 8,72 36,72" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+                <circle cx="16" cy="30" r="9" fill="#f43f5e"/>
+                <circle cx="28" cy="28" r="9" fill="#fb7185"/>
+                <circle cx="22" cy="20" r="9" fill="#fbbf24"/>
+                <path d="M 14,54 Q 22,60 30,54" fill="none" stroke="#ef4444" stroke-width="4"/>
+              </g>
+            </g>
+          </svg>`;
+
+        case 'capScroll':
+          return `
+          <svg viewBox="0 0 260 210" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <g transform="rotate(14 130 105)">
+              <rect x="28" y="112" width="195" height="40" rx="16" fill="#f8fafc" stroke="#1e293b" stroke-width="3"/>
+              <ellipse cx="36" cy="132" rx="7" ry="18" fill="#cbd5e1" stroke="#1e293b" stroke-width="2"/>
+              <rect x="112" y="110" width="24" height="44" rx="4" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+              <path d="M 124,152 L 106,186 L 120,180 L 126,192 L 138,152" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+              <polygon points="130,18 242,62 130,104 18,62" fill="#1e293b" stroke="#ffffff" stroke-width="3"/>
+              <path d="M 74,80 L 74,116 Q 130,98 186,116 L 186,80 Z" fill="#0f172a" stroke="#ffffff" stroke-width="2"/>
+              <path d="M 130,60 Q 75,65 44,98" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="130" cy="60" r="6" fill="#fbbf24"/>
+            </g>
+          </svg>`;
+
+        case 'goldMedal1':
+          return `
+          <svg viewBox="0 0 200 230" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <defs>
+              <linearGradient id="goldRim" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="50%" stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#854d0e"/>
+              </linearGradient>
+            </defs>
+            <polygon points="72,165 52,222 80,208 96,225 102,168" fill="#b91c1c"/>
+            <polygon points="128,165 148,222 120,208 104,225 98,168" fill="#991b1b"/>
+            <circle cx="100" cy="100" r="78" fill="#0e475d" stroke="url(#goldRim)" stroke-width="6"/>
+            <circle cx="100" cy="100" r="68" fill="none" stroke="#fef08a" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle cx="100" cy="100" r="58" fill="url(#goldRim)"/>
+            <path d="M 65,125 Q 52,90 78,65 M 135,125 Q 148,90 122,65" fill="none" stroke="#713f12" stroke-width="4" stroke-linecap="round"/>
+            <text x="100" y="122" font-family="'Cairo', sans-serif" font-weight="900" font-size="68" text-anchor="middle" fill="#713f12">1</text>
+          </svg>`;
+
+        case 'winnerMedal':
+          return `
+          <svg viewBox="0 0 200 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <polygon points="68,165 44,230 74,215 92,234 100,170" fill="#1d4ed8" stroke="#ffffff" stroke-width="2"/>
+            <polygon points="132,165 156,230 126,215 108,234 100,170" fill="#1e40af" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="100" cy="100" r="76" fill="#fbbf24" stroke="#92400e" stroke-width="4"/>
+            <circle cx="100" cy="100" r="58" fill="#1e3a8a" stroke="#fef08a" stroke-width="3"/>
+            <polygon points="100,56 108,74 128,76 113,89 117,108 100,98 83,108 87,89 72,76 92,74" fill="#fde047"/>
+            <text x="100" y="132" font-family="'Cairo', sans-serif" font-weight="900" font-size="20" text-anchor="middle" fill="#ffffff">WINNER</text>
+          </svg>`;
+
+        case 'quillInk':
+          return `
+          <svg viewBox="0 0 180 320" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <path d="M 92,230 Q 65,120 22,18 Q 105,60 122,165 L 98,160 L 124,182 Q 126,205 98,230 Z" fill="#139a9c"/>
+            <path d="M 92,235 Q 72,135 22,18" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+            <rect x="56" y="226" width="68" height="18" rx="4" fill="#94a3b8"/>
+            <path d="M 46,244 L 134,244 L 148,268 L 148,312 L 32,312 L 32,268 Z" fill="#0c3144" stroke="#94a3b8" stroke-width="4"/>
+          </svg>`;
+
+        case 'officialStamp':
+          return `
+          <svg viewBox="0 0 240 240" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none; opacity:0.88;">
+            <circle cx="120" cy="120" r="108" fill="none" stroke="#0c4b5e" stroke-width="5"/>
+            <circle cx="120" cy="120" r="98" fill="none" stroke="#139a9c" stroke-width="2" stroke-dasharray="5 3"/>
+            <circle cx="120" cy="120" r="68" fill="none" stroke="#0c4b5e" stroke-width="2.5"/>
+            <text x="120" y="44" font-family="'Cairo', sans-serif" font-weight="900" font-size="16" text-anchor="middle" fill="#0c4b5e">مؤسسة مرمرة التعليمية</text>
+            <text x="120" y="108" font-family="'Cairo', sans-serif" font-weight="900" font-size="19" text-anchor="middle" fill="#139a9c">مدرسة مرمرة الخاصة</text>
+            <text x="120" y="134" font-family="'Cairo', sans-serif" font-weight="800" font-size="14" text-anchor="middle" fill="#0c4b5e">الإدارة العامة</text>
+            <text x="120" y="156" font-family="'Cairo', sans-serif" font-weight="700" font-size="12" text-anchor="middle" fill="#139a9c">MARMARA SCHOOL</text>
+            <text x="120" y="205" font-family="'Cairo', sans-serif" font-weight="800" font-size="14" text-anchor="middle" fill="#0c4b5e">★ مارع - حلب ★</text>
+          </svg>`;
+
+        case 'medalIdeal':
+        case 'medalReader':
+        case 'medalMental':
+        case 'medalEthics': {
+          const titles = {
+            medalIdeal: ['الطالب', 'المثالي'],
+            medalReader: ['بطل', 'القراءة'],
+            medalMental: ['نجم الحساب', 'الذهني'],
+            medalEthics: ['سفير', 'الأخلاق']
+          };
+          const tPair = titles[stickerType] || ['وسام', 'التميز'];
+          return `
+          <svg viewBox="0 0 210 250" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;">
+            <polygon points="68,170 46,238 78,220 96,240 105,175" fill="#0c4b5e" stroke="#d4af37" stroke-width="2"/>
+            <polygon points="142,170 164,238 132,220 114,240 105,175" fill="#139a9c" stroke="#d4af37" stroke-width="2"/>
+            <circle cx="105" cy="105" r="82" fill="#d4af37" stroke="#0c4b5e" stroke-width="4"/>
+            <circle cx="105" cy="105" r="68" fill="#0c4b5e" stroke="#fef08a" stroke-width="2.5"/>
+            <text x="105" y="64" font-size="22" text-anchor="middle" fill="#fde047">★ ★ ★</text>
+            <text x="105" y="102" font-family="'Cairo', sans-serif" font-weight="900" font-size="22" text-anchor="middle" fill="#ffffff">${tPair[0]}</text>
+            <text x="105" y="132" font-family="'Cairo', sans-serif" font-weight="900" font-size="24" text-anchor="middle" fill="#fde047">${tPair[1]}</text>
+          </svg>`;
+        }
+
+        case 'managerSig':
+          if (window._marmaraSigImg) {
+            return '<img src="' + window._marmaraSigImg + '" style="width:100%; height:100%; object-fit:contain; pointer-events:none;" />';
+          }
+          const sigColor = extraText || '#0c3144';
+          return '<svg viewBox="0 0 240 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible; pointer-events:none;"><path d="M 195,52 C 175,48 155,62 135,58 C 122,55 116,44 108,12 C 105,28 112,58 118,66 C 122,70 92,66 42,66 M 155,74 C 135,82 105,82 88,74" fill="none" stroke="' + sigColor + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        default:
+          return '';
+      }
+    }
+
+    /********************************************************************
+     * 2. قاعدة بيانات القوالب (مع إضافة قالب "وسام التميز" الجديد في المقدمة)
+     ********************************************************************/
+    const TEMPLATES_DB = {
+      // القالب الجديد المطلوب: وسام التميز (مطابق للصورة المرفقة مع تسميته "وسام التميز")
+      tpl_medal_excellence: {
+        id: 'tpl_medal_excellence',
+        name: 'وسام التميز (النجمة الذهبية)',
+        badge: 'أفقي - جديد',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'وسام التميز',
+          recipient: 'محمد الأحمد',
+          intro: 'بكل فخر واعتزاز، تمنح هذه الشهادة للطالب/ة',
+          reason: 'تقديراً لتميزه/ها في الالتزام والهدوء وحسن السلوك والاجتهاد،\nولكونه/ها مثالاً يُحتذى به بين زملائه/ها.',
+          manager: 'إدارة المدرسة',
+          date: 'نفتخر بتميزكم، ونتمنى لكم دوام النجاح والتألق.'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="meDarkNavy" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#021622"/>
+                <stop offset="50%" stop-color="#083344"/>
+                <stop offset="100%" stop-color="#021019"/>
+              </linearGradient>
+              <linearGradient id="meTealWave" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#0d9488"/>
+                <stop offset="50%" stop-color="#0891b2"/>
+                <stop offset="100%" stop-color="#064e63"/>
+              </linearGradient>
+              <linearGradient id="meGoldMetallic" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#92400e"/>
+                <stop offset="25%" stop-color="#fde047"/>
+                <stop offset="50%" stop-color="#ca8a04"/>
+                <stop offset="75%" stop-color="#fef08a"/>
+                <stop offset="100%" stop-color="#854d0e"/>
+              </linearGradient>
+            </defs>
+
+            <!-- الخلفية الكحلية والفيروزية الخارجية في الزوايا -->
+            <rect width="1123" height="794" fill="url(#meDarkNavy)"/>
+
+            <!-- تموجات فيروزية لامعة في الزوايا الأربع -->
+            <path d="M 0,0 L 620,0 Q 320,35 0,245 Z" fill="url(#meTealWave)" opacity="0.85"/>
+            <path d="M 520,0 L 1123,0 L 1123,280 Q 880,60 520,0 Z" fill="url(#meTealWave)" opacity="0.75"/>
+            <path d="M 0,520 Q 220,730 580,794 L 0,794 Z" fill="url(#meTealWave)" opacity="0.85"/>
+            <path d="M 1123,510 L 1123,794 L 460,794 Q 880,740 1123,510 Z" fill="url(#meTealWave)" opacity="0.9"/>
+
+            <!-- الدرع الأبيض المنحني في المنتصف مع الإطار الذهبي المزدوج -->
+            <path d="M 75,115 C 210,32 390,92 545,58 C 705,92 895,45 1048,132 C 1125,295 1125,505 1042,672 C 895,775 705,715 552,758 C 395,715 215,775 72,672 C -12,505 -12,295 75,115 Z"
+                  fill="#f8fafc" stroke="url(#meGoldMetallic)" stroke-width="11"/>
+            <path d="M 88,126 C 218,48 392,104 545,72 C 702,104 885,58 1034,142 C 1108,298 1108,498 1028,660 C 885,758 702,702 552,742 C 398,702 222,758 86,660 C 6,498 6,298 88,126 Z"
+                  fill="#ffffff" stroke="rgba(212,175,55,0.35)" stroke-width="2.5"/>
+
+            <!-- أغصان الغار المائية الهادئة على يمين ويسار المساحة البيضاء -->
+            <g fill="#cbd5e1" opacity="0.38">
+              <!-- غصن أيسر -->
+              <path d="M 55,610 Q 18,430 62,250" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+              <ellipse cx="42" cy="540" rx="22" ry="8" transform="rotate(-35 42 540)"/>
+              <ellipse cx="35" cy="485" rx="24" ry="8" transform="rotate(-30 35 485)"/>
+              <ellipse cx="34" cy="430" rx="24" ry="8" transform="rotate(-20 34 430)"/>
+              <ellipse cx="38" cy="375" rx="22" ry="8" transform="rotate(-10 38 375)"/>
+              <ellipse cx="48" cy="320" rx="20" ry="7" transform="rotate(5 48 320)"/>
+              <ellipse cx="68" cy="515" rx="22" ry="8" transform="rotate(35 68 515)"/>
+              <ellipse cx="62" cy="460" rx="22" ry="8" transform="rotate(30 62 460)"/>
+              <ellipse cx="60" cy="405" rx="22" ry="8" transform="rotate(20 60 405)"/>
+              <!-- غصن أيمن -->
+              <path d="M 1068,610 Q 1105,430 1061,250" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+              <ellipse cx="1081" cy="540" rx="22" ry="8" transform="rotate(35 1081 540)"/>
+              <ellipse cx="1088" cy="485" rx="24" ry="8" transform="rotate(30 1088 485)"/>
+              <ellipse cx="1089" cy="430" rx="24" ry="8" transform="rotate(20 1089 430)"/>
+              <ellipse cx="1085" cy="375" rx="22" ry="8" transform="rotate(10 1085 375)"/>
+              <ellipse cx="1055" cy="515" rx="22" ry="8" transform="rotate(-35 1055 515)"/>
+              <ellipse cx="1061" cy="460" rx="22" ry="8" transform="rotate(-30 1061 460)"/>
+              <ellipse cx="1063" cy="405" rx="22" ry="8" transform="rotate(-20 1063 405)"/>
+            </g>
+
+            <!-- القوس الذهبي المنحني أسفل عنوان "وسام التميز" -->
+            <path d="M 315,232 Q 555,192 825,228 Q 845,232 830,220 Q 555,174 315,232 Z" fill="url(#meGoldMetallic)"/>
+
+            <!-- خط التوقيع السفلي تحت إدارة المدرسة -->
+            <line x1="168" y1="712" x2="442" y2="712" stroke="#0c3144" stroke-width="2.5"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 64, y: 82, w: 185, h: 162, scale: 1 },
+          { id: 'threeStars', type: 'sticker', stickerType: 'threeGoldStars', x: 405, y: 6, w: 295, h: 110, scale: 1 },
+          { id: 'starRibbon', type: 'sticker', stickerType: 'starRibbon3D', x: 842, y: 2, w: 275, h: 325, scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'وسام التميز', x: 295, y: 102, w: 530, fontSize: 74, fontFamily: "'Cairo', sans-serif", color: '#082f49', fontWeight: '900', shadow: true, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'بكل فخر واعتزاز، تمنح هذه الشهادة للطالب/ة', x: 245, y: 242, w: 615, fontSize: 31, fontFamily: "'Cairo', sans-serif", color: '#082f49', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'goldOvalInput', text: 'محمد الأحمد', x: 145, y: 304, w: 830, h: 92, fontSize: 38, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '900', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'تقديراً لتميزه/ها في الالتزام والهدوء وحسن السلوك والاجتهاد،\nولكونه/ها مثالاً يُحتذى به بين زملائه/ها.', x: 110, y: 416, w: 900, fontSize: 32, fontFamily: "'Cairo', sans-serif", color: '#082f49', fontWeight: '800', scale: 1 },
+          { id: 'date', role: 'date', type: 'navyGoldRibbon', text: 'نفتخر بتميزكم، ونتمنى لكم دوام النجاح والتألق.', x: 142, y: 545, w: 840, h: 78, fontSize: 30, fontFamily: "'Cairo', sans-serif", color: '#ffffff', fontWeight: '800', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'إدارة المدرسة', x: 185, y: 652, w: 240, fontSize: 31, fontFamily: "'Cairo', sans-serif", color: '#082f49', fontWeight: '800', scale: 1 }
+        ]
+      },
+
+      // 1. شهادة فخر (الأمواج الذهبية والفيروزية - أفقي)
+      tpl_pride: {
+        id: 'tpl_pride',
+        name: 'شهادة فخر (أمواج مرمرة)',
+        badge: 'أفقي - رسمي',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شهادة فخر',
+          recipient: 'بالطالبة : الاء الحسن',
+          intro: 'تفخر أسرة مرمرة التعليمية\nوالأستاذ أحمد الرجب',
+          reason: 'لتفوقها في اختبارات اللغة العربية\nمتمنين لها دوام التوفيق والنجاح',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '2026/04/23'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bgWaveTeal" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0a3446"/>
+                <stop offset="50%" stop-color="#155e75"/>
+                <stop offset="100%" stop-color="#082836"/>
+              </linearGradient>
+              <linearGradient id="bgWaveGold" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#b48608"/>
+                <stop offset="50%" stop-color="#fde047"/>
+                <stop offset="100%" stop-color="#a16207"/>
+              </linearGradient>
+            </defs>
+            <rect width="1123" height="794" fill="#f8fafc"/>
+            <path d="M 0,45 Q 560,0 1123,55 M 0,65 Q 560,15 1123,75 M 0,85 Q 560,30 1123,95" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+            <path d="M 0,500 Q 280,530 561,625 Q 840,530 1123,515 L 1123,794 L 0,794 Z" fill="url(#bgWaveGold)"/>
+            <path d="M 0,555 Q 280,585 561,665 Q 840,585 1123,555 L 1123,794 L 0,794 Z" fill="url(#bgWaveTeal)"/>
+            <path d="M 0,715 Q 561,640 1123,735 L 1123,794 L 0,794 Z" fill="#06202b" opacity="0.65"/>
+            <line x1="330" y1="226" x2="793" y2="226" stroke="#b48608" stroke-width="2.5"/>
+            <rect x="551" y="216" width="20" height="20" transform="rotate(45 561 226)" fill="#d4af37"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 45, y: 32, w: 135, h: 120, scale: 1 },
+          { id: 'schoolName', type: 'text', text: 'مؤسسة مرمرة\nالتعليمية الخاصة', x: 925, y: 45, fontSize: 22, fontFamily: "'Cairo', sans-serif", color: '#0e475d', fontWeight: '800', scale: 1 },
+          { id: 'ayah', type: 'text', text: '﴿ يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ ﴾', x: 320, y: 48, fontSize: 25, fontFamily: "'Amiri', serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة فخر', x: 370, y: 98, w: 380, fontSize: 78, fontFamily: "'Aref Ruqaa', serif", color: '#b48608', fontWeight: '700', shadow: true, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'تفخر أسرة مرمرة التعليمية\nوالأستاذ أحمد الرجب', x: 260, y: 242, w: 600, fontSize: 38, fontFamily: "'Cairo', sans-serif", color: '#0e475d', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'pillText', text: 'بالطالبة : الاء الحسن', x: 331, y: 382, w: 460, fontSize: 36, fontFamily: "'Amiri', serif", color: '#b48608', fontWeight: '700', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'لتفوقها في اختبارات اللغة العربية\nمتمنين لها دوام التوفيق والنجاح', x: 260, y: 458, w: 600, fontSize: 30, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', scale: 1 },
+          { id: 'medal', type: 'sticker', stickerType: 'goldMedal1', x: 461, y: 558, w: 200, h: 220, scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 38, y: 575, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#ffffff', fontWeight: '700', scale: 1 },
+          { id: 'sig', type: 'sticker', stickerType: 'managerSig', extraText: '#ffffff', x: 42, y: 600, w: 170, h: 70, scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: '2026/04/23', x: 920, y: 605, fontSize: 25, fontFamily: "'Cairo', sans-serif", color: '#ffffff', fontWeight: '800', scale: 1 }
+        ]
+      },
+
+      // 2. شهادة تخرج 2027 (الأزهار المائية والخريج)
+      tpl_grad2027: {
+        id: 'tpl_grad2027',
+        name: 'شهادة تخرج 2027 (الخريج والأزهار)',
+        badge: 'أفقي - تخرج 2027',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شهادة شكر وتقدير',
+          recipient: 'أحمد العلي',
+          intro: 'تتقدم مؤسسة مرمرة التعليمية\nبأحر التهاني والتبريكات للتلميذ النجيب',
+          reason: 'جزاء اجتهاده وتفوقه وإصراره\nعلى النجاح\nكما نتمنى له المزيد من التقدم والمضي\nبنجاح في مسيرته الدراسية',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '2027'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#f8fafc"/>
+            <ellipse cx="140" cy="80" rx="180" ry="110" fill="#bae6fd" opacity="0.45"/>
+            <ellipse cx="860" cy="730" rx="280" ry="120" fill="#bae6fd" opacity="0.5"/>
+            <g opacity="0.85">
+              <path d="M 1123,0 Q 980,60 890,170 M 1040,40 Q 960,25 910,45 M 1010,85 Q 1030,150 980,210" fill="none" stroke="#64748b" stroke-width="2.5"/>
+              <circle cx="940" cy="70" r="18" fill="#7dd3fc"/><circle cx="985" cy="115" r="15" fill="#93c5fd"/><circle cx="910" cy="135" r="14" fill="#bfdbfe"/>
+              <ellipse cx="1055" cy="65" rx="18" ry="8" transform="rotate(-25 1055 65)" fill="#86efac"/>
+              <ellipse cx="945" cy="35" rx="16" ry="7" transform="rotate(15 945 35)" fill="#86efac"/>
+              <path d="M 0,794 Q 160,710 290,610 M 120,730 Q 220,750 320,710 M 95,670 Q 140,590 210,550" fill="none" stroke="#64748b" stroke-width="2.5"/>
+              <circle cx="195" cy="665" r="20" fill="#7dd3fc"/><circle cx="255" cy="705" r="16" fill="#93c5fd"/><circle cx="145" cy="610" r="15" fill="#bfdbfe"/>
+              <ellipse cx="85" cy="715" rx="20" ry="9" transform="rotate(-30 85 715)" fill="#86efac"/>
+            </g>
+            <rect x="38" y="34" width="1047" height="726" fill="none" stroke="#334155" stroke-width="2"/>
+            <rect x="46" y="42" width="1031" height="710" fill="none" stroke="#64748b" stroke-width="1"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 70, y: 54, w: 105, h: 92, scale: 1 },
+          { id: 'gradCap2027', type: 'sticker', stickerType: 'gradCap2027', extraText: '2027', x: 26, y: 56, w: 195, h: 520, scale: 1 },
+          { id: 'gradBoy', type: 'sticker', stickerType: 'gradBoy', x: 825, y: 295, w: 255, h: 360, scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة شكر وتقدير', x: 295, y: 48, w: 520, fontSize: 76, fontFamily: "'Aref Ruqaa', serif", color: '#0f172a', fontWeight: '700', scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'تتقدم مؤسسة مرمرة التعليمية\nبأحر التهاني والتبريكات للتلميذ النجيب', x: 245, y: 205, w: 580, fontSize: 35, fontFamily: "'Amiri', serif", color: '#0f172a', fontWeight: '700', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'أحمد العلي', x: 310, y: 325, w: 450, fontSize: 44, fontFamily: "'Cairo', sans-serif", color: '#139a9c', fontWeight: '900', underline: true, scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'جزاء اجتهاده وتفوقه وإصراره\nعلى النجاح\nكما نتمنى له المزيد من التقدم والمضي\nبنجاح في مسيرته الدراسية', x: 235, y: 418, w: 590, fontSize: 33, fontFamily: "'Amiri', serif", color: '#0f172a', fontWeight: '700', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 440, y: 695, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#0f172a', fontWeight: '700', scale: 1 }
+        ]
+      },
+
+      // 3. شهادة تهنئة وتفوق
+      tpl_congrats: {
+        id: 'tpl_congrats',
+        name: 'شهادة تهنئة (الخريج والوسام)',
+        badge: 'أفقي - تهنئة',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شهادة تهنئة',
+          recipient: 'محمد الحسن',
+          intro: 'يسر مؤسسة مرمرة التعليمية ويشرف الأستاذ/ة :\nأن تقدم هذه الشهادة للطالب المتفوق :',
+          reason: 'قسم : الأول   |   الموسم الدراسي : 2026/2027\nهذا بعد تميزه وتفوقه خلال الفصل الأول وتحصله على نتائج\nمشرفة، كما نتمنى له مزيداً من التفوق في مشواره الدراسي.',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '2027'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#ffffff"/>
+            <g transform="translate(115, 110) rotate(-32)" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2">
+              <path d="M 0,120 Q 45,55 120,0" fill="none" stroke-width="3.5"/>
+              <ellipse cx="25" cy="90" rx="18" ry="8" transform="rotate(-20 25 90)"/>
+              <ellipse cx="50" cy="62" rx="18" ry="8" transform="rotate(-25 50 62)"/>
+              <ellipse cx="80" cy="35" rx="18" ry="8" transform="rotate(-30 80 35)"/>
+              <ellipse cx="42" cy="105" rx="18" ry="8" transform="rotate(25 42 105)"/>
+              <ellipse cx="72" cy="78" rx="18" ry="8" transform="rotate(20 72 78)"/>
+            </g>
+            <path d="M 190,145 Q 560,115 920,150 Q 985,280 965,450 Q 985,610 910,680 Q 740,715 561,675 Q 380,715 205,675 Q 140,560 165,380 Q 145,230 190,145 Z" fill="#e0f7fa" stroke="#0f172a" stroke-width="4" stroke-dasharray="12 9"/>
+            <path d="M 430,445 Q 561,425 692,445" fill="none" stroke="#334155" stroke-width="2"/>
+            <circle cx="561" cy="436" r="5" fill="#0f172a"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 48, y: 38, w: 105, h: 92, scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة تهنئة', x: 315, y: 42, w: 490, fontSize: 78, fontFamily: "'Reem Kufi', sans-serif", color: '#ffffff', strokeColor: '#0f172a', fontWeight: '700', scale: 1 },
+          { id: 'capScroll', type: 'sticker', stickerType: 'capScroll', x: 840, y: 98, w: 235, h: 190, scale: 1 },
+          { id: 'congratsBoy', type: 'sticker', stickerType: 'congratsBoy', x: 35, y: 245, w: 265, h: 365, scale: 1 },
+          { id: 'winnerMedal', type: 'sticker', stickerType: 'winnerMedal', x: 845, y: 490, w: 195, h: 235, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'يسر مؤسسة مرمرة التعليمية ويشرف الأستاذ/ة :\nأن تقدم هذه الشهادة للطالب المتفوق :', x: 300, y: 215, w: 540, fontSize: 27, fontFamily: "'Cairo', sans-serif", color: '#0f172a', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'محمد الحسن', x: 340, y: 342, w: 460, fontSize: 42, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '900', underline: true, scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'قسم : الأول   |   الموسم الدراسي : 2026/2027\nهذا بعد تميزه وتفوقه خلال الفصل الأول وتحصله على نتائج\nمشرفة، كما نتمنى له مزيداً من التفوق في مشواره الدراسي.', x: 295, y: 462, w: 550, fontSize: 24, fontFamily: "'Cairo', sans-serif", color: '#0f172a', fontWeight: '800', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 330, y: 615, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#0f172a', fontWeight: '800', scale: 1 }
+        ]
+      },
+
+      // 4. القالب الإسلامي والريشة
+      tpl_islamic: {
+        id: 'tpl_islamic',
+        name: 'شكر وتقدير (القوس الفيروزي والريشة)',
+        badge: 'أفقي - إسلامي',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شكر وتقدير',
+          recipient: 'الفرع العلمي',
+          intro: 'إدارة مرمرة للعلوم واللغات\nوالأستاذ أحمد الرجب\nيتقدمان بالشكر والتقدير لطلاب',
+          reason: 'وذلك للتفوق في مادة اللغة العربية',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '17/4/2026'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#f8fafc"/>
+            <path d="M 650,0 L 1123,0 L 1123,794 L 640,794 Q 930,420 650,0 Z" fill="#0d6e78"/>
+            <path d="M 710,0 L 1123,0 L 1123,720 Q 910,360 710,0 Z" fill="#139a9c" opacity="0.55"/>
+            <path d="M 645,0 Q 925,420 995,794 L 1025,794 Q 950,410 685,0 Z" fill="#d4af37"/>
+            <path d="M 565,0 Q 860,400 620,794" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M 585,0 Q 880,400 640,794" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 28, y: 24, w: 130, h: 115, scale: 1 },
+          { id: 'quill', type: 'sticker', stickerType: 'quillInk', x: 12, y: 470, w: 145, h: 295, scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شكر وتقدير', x: 215, y: 55, w: 390, fontSize: 82, fontFamily: "'Aref Ruqaa', serif", color: '#b48608', fontWeight: '700', shadow: true, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'إدارة مرمرة للعلوم واللغات\nوالأستاذ أحمد الرجب\nيتقدمان بالشكر والتقدير لطلاب', x: 165, y: 265, w: 500, fontSize: 36, fontFamily: "'Cairo', sans-serif", color: '#0e475d', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'الفرع العلمي', x: 230, y: 448, w: 370, fontSize: 42, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '900', underline: true, scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'وذلك للتفوق في مادة اللغة العربية', x: 185, y: 545, w: 460, fontSize: 34, fontFamily: "'Amiri', serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 410, y: 710, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', underline: true, scale: 1 },
+          { id: 'sig', type: 'sticker', stickerType: 'managerSig', extraText: '#0c3144', x: 420, y: 692, w: 150, h: 65, scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: '17/4/2026', x: 195, y: 710, fontSize: 22, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', underline: true, scale: 1 }
+        ]
+      },
+
+      // 5. القالب الكلاسيكي
+      tpl_classic: {
+        id: 'tpl_classic',
+        name: 'القالب الكلاسيكي (الإطار الملكي)',
+        badge: 'أفقي - كلاسيكي',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شهادة تقدير',
+          recipient: 'محمد أحمد الخطيب',
+          intro: 'تُمنح هذه الشهادة بكل فخر واعتزاز إلى الطالب/ة',
+          reason: 'تقديراً لجهوده/ا المتميزة، وتفوقه/ا في دراسته/ا،\nمتمنين له/ا دوام النجاح والتقدم في مسيرته/ا العلمية.\nلأنكم دائماً في طليعة المستقبل',
+          manager: 'مدير المدرسة\nأ. عبدالقادر الخطيب',
+          date: 'التاريخ\n2026 / 04 / 23'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#092c3e"/>
+            <rect x="24" y="24" width="1075" height="746" rx="8" fill="#f8fafc" stroke="#d4af37" stroke-width="5"/>
+            <rect x="42" y="42" width="1039" height="710" rx="4" fill="none" stroke="#b48608" stroke-width="2"/>
+            <polygon points="0,0 165,0 0,165" fill="#139a9c"/><polygon points="150,0 180,0 0,180 0,150" fill="#d4af37"/>
+            <polygon points="1123,0 958,0 1123,165" fill="#139a9c"/><polygon points="973,0 943,0 1123,180 1123,150" fill="#d4af37"/>
+            <polygon points="0,794 165,794 0,629" fill="#139a9c"/><polygon points="150,794 180,794 0,614 0,644" fill="#d4af37"/>
+            <polygon points="1123,794 958,794 1123,629" fill="#139a9c"/><polygon points="973,794 943,794 1123,614 1123,644" fill="#d4af37"/>
+            <line x1="230" y1="368" x2="893" y2="368" stroke="#0c3144" stroke-width="2" stroke-dasharray="6 4"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 115, y: 65, w: 145, h: 128, scale: 1 },
+          { id: 'schoolInfo', type: 'text', text: 'مدرسة مرمرة الخاصة\nمارع مقابل حديقة الخطيب\n00905526999650', x: 805, y: 92, fontSize: 19, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة تقدير', x: 365, y: 88, w: 390, fontSize: 76, fontFamily: "'Aref Ruqaa', serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'تُمنح هذه الشهادة بكل فخر واعتزاز إلى الطالب/ة', x: 260, y: 262, w: 600, fontSize: 28, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'محمد أحمد الخطيب', x: 330, y: 312, w: 460, fontSize: 36, fontFamily: "'Amiri', serif", color: '#139a9c', fontWeight: '700', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'تقديراً لجهوده/ا المتميزة، وتفوقه/ا في دراسته/ا،\nمتمنين له/ا دوام النجاح والتقدم في مسيرته/ا العلمية.\nلأنكم دائماً في طليعة المستقبل', x: 210, y: 395, w: 700, fontSize: 26, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'medal', type: 'sticker', stickerType: 'goldMedal1', x: 481, y: 552, w: 160, h: 185, scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'مدير المدرسة\nأ. عبدالقادر الخطيب', x: 165, y: 605, fontSize: 21, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: 'التاريخ\n2026 / 04 / 23', x: 785, y: 605, fontSize: 21, fontFamily: "'Cairo', sans-serif", color: '#0c3144', fontWeight: '800', scale: 1 }
+        ]
+      },
+
+      // 6. شهادة تقدير وتفوق (الشريط الجانبي)
+      tpl_excellence_side: {
+        id: 'tpl_excellence_side',
+        name: 'شهادة تقدير وتفوق (الشريط الجانبي)',
+        badge: 'أفقي - حديث',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شهادة تقدير وتفوق',
+          recipient: 'للطالب : محمد الأحمد',
+          intro: 'تتقدم إدارة مدرسة مرمرة الخاصة\nبالشكر والتقدير',
+          reason: 'على تفوقه في الفصل الدراسي الأول للعام الدراسي 2026/2027\nكما تتقدم بالشكر الجزيل لأسرته على حسن المتابعة والاهتمام\nسائلين الله له المزيد من التفوق والنجاح',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '2026 / 04 / 23\nتاريخ'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#f4f4f6"/>
+            <rect x="895" y="0" width="228" height="794" fill="#065f73"/>
+            <polygon points="895,0 950,0 915,794 875,794" fill="#d4af37"/>
+            <polygon points="945,0 990,0 960,794 920,794" fill="#eab308"/>
+            <circle cx="962" cy="405" r="122" fill="#065f73" stroke="#eab308" stroke-width="12"/>
+            <polygon points="962,265 1035,288 962,310 889,288" fill="#1e293b"/>
+            <rect x="928" y="302" width="68" height="22" rx="4" fill="#0f172a"/>
+            <line x1="928" y1="312" x2="996" y2="312" stroke="#eab308" stroke-width="3"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'gold', x: 892, y: 342, w: 140, h: 125, scale: 1 },
+          { id: 'ayah', type: 'text', text: '﴿ يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ ﴾', x: 205, y: 38, fontSize: 25, fontFamily: "'Amiri', serif", color: '#065f73', fontWeight: '700', scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة تقدير وتفوق', x: 195, y: 92, w: 500, fontSize: 70, fontFamily: "'Aref Ruqaa', serif", color: '#1e293b', fontWeight: '700', scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'تتقدم إدارة مدرسة مرمرة الخاصة\nبالشكر والتقدير', x: 205, y: 222, w: 480, fontSize: 34, fontFamily: "'Cairo', sans-serif", color: '#065f73', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'pillText', text: 'للطالب : محمد الأحمد', x: 215, y: 336, w: 460, fontSize: 34, fontFamily: "'Cairo', sans-serif", color: '#0f172a', fontWeight: '900', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'على تفوقه في الفصل الدراسي الأول للعام الدراسي 2026/2027\nكما تتقدم بالشكر الجزيل لأسرته على حسن المتابعة والاهتمام\nسائلين الله له المزيد من التفوق والنجاح', x: 75, y: 440, w: 740, fontSize: 28, fontFamily: "'Cairo', sans-serif", color: '#065f73', fontWeight: '800', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 175, y: 668, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#1e293b', fontWeight: '800', underline: true, scale: 1 },
+          { id: 'sig', type: 'sticker', stickerType: 'managerSig', extraText: '#312e81', x: 185, y: 655, w: 150, h: 65, scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: '2026 / 04 / 23\nتاريخ', x: 575, y: 665, fontSize: 21, fontFamily: "'Cairo', sans-serif", color: '#1e293b', fontWeight: '800', underline: true, scale: 1 }
+        ]
+      },
+
+      // 7. شهادة تقدير المعلم (عمودي)
+      tpl_teacher_modern: {
+        id: 'tpl_teacher_modern',
+        name: 'شهادة تقدير المعلم (عمودي)',
+        badge: 'عمودي - معلمين',
+        orientation: 'portrait',
+        defaultFields: {
+          calligraphy: 'شهادة تقدير',
+          recipient: 'المعلم الفاضل',
+          intro: 'إلى من جعلوا من العلم رسالة ومن العطاء نهجاً\nشكراً لجهودكم المخلصة التي أسهمت\nفي رفع مؤسستنا وبناء طلابنا',
+          reason: 'على جهودك وعطائك اللامحدود',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: 'مؤسسة مرمرة\nالتعليمية الخاصة'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 794 1123" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="794" height="1123" fill="#fcfbf7"/>
+            <rect x="20" y="20" width="754" height="1083" fill="none" stroke="#d4af37" stroke-width="2"/>
+            <path d="M 480,0 L 794,0 L 794,430 Q 690,150 480,0 Z" fill="#09384a"/>
+            <path d="M 460,0 Q 675,155 794,450 L 794,415 Q 680,140 495,0 Z" fill="#d4af37"/>
+            <path d="M 0,720 Q 110,980 340,1123 L 0,1123 Z" fill="#09384a"/>
+            <path d="M 0,700 Q 120,970 365,1123 L 330,1123 Q 105,965 0,735 Z" fill="#d4af37"/>
+            <line x1="180" y1="398" x2="614" y2="398" stroke="#d4af37" stroke-width="2"/>
+            <line x1="180" y1="735" x2="614" y2="735" stroke="#0c3144" stroke-width="2"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'original', x: 38, y: 58, w: 125, h: 112, scale: 1 },
+          { id: 'ayah', type: 'text', text: '﴿ إِنَّمَا يَخْشَى اللَّهَ مِنْ عِبَادِهِ الْعُلَمَاءُ إِنَّ اللَّهَ عَزِيزٌ غَفُورٌ ﴾', x: 185, y: 118, fontSize: 22, fontFamily: "'Amiri', serif", color: '#0c3144', fontWeight: '700', scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شهادة تقدير', x: 195, y: 215, w: 400, fontSize: 80, fontFamily: "'Aref Ruqaa', serif", color: '#b48608', fontWeight: '700', shadow: true, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'إلى من جعلوا من العلم رسالة ومن العطاء نهجاً\nشكراً لجهودكم المخلصة التي أسهمت\nفي رفع مؤسستنا وبناء طلابنا', x: 95, y: 435, w: 600, fontSize: 31, fontFamily: "'Amiri', serif", color: '#09384a', fontWeight: '700', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'المعلم الفاضل', x: 245, y: 635, w: 300, fontSize: 38, fontFamily: "'Amiri', serif", color: '#09384a', fontWeight: '700', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'على جهودك وعطائك اللامحدود', x: 145, y: 775, w: 500, fontSize: 34, fontFamily: "'Amiri', serif", color: '#09384a', fontWeight: '700', scale: 1 },
+          { id: 'medal', type: 'sticker', stickerType: 'goldMedal1', x: 327, y: 875, w: 140, h: 160, scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 115, y: 905, fontSize: 19, fontFamily: "'Cairo', sans-serif", color: '#1e293b', fontWeight: '700', scale: 1 },
+          { id: 'sig', type: 'sticker', stickerType: 'managerSig', extraText: '#1e293b', x: 120, y: 925, w: 140, h: 55, scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: 'مؤسسة مرمرة\nالتعليمية الخاصة', x: 525, y: 905, fontSize: 22, fontFamily: "'Cairo', sans-serif", color: '#0d6e78', fontWeight: '800', scale: 1 }
+        ]
+      },
+
+      // 8. شكر وتقدير للمعلم (الفضي الملكي)
+      tpl_teacher_silver: {
+        id: 'tpl_teacher_silver',
+        name: 'شكر وتقدير للمعلم (الفضي الملكي)',
+        badge: 'عمودي - فاخر',
+        orientation: 'portrait',
+        defaultFields: {
+          calligraphy: 'شكر وتقدير',
+          recipient: 'أحمد حاج رجب',
+          intro: 'لكل من أخلص وأبدع وتفانى في سبيل تحقيق\nحلم طلابنا وأثرى عقولهم بالمعرفة\nتتقدم إدارة مرمرة للعلوم واللغات\nبجزيل الشكر والتقدير\nللمعلم الفاضل',
+          reason: 'أَعَلِمْتَ أَشْرَفَ أَوْ أَجَلَّ مِنَ الَّذِي    يَبْنِي وَيُنْشِئُ أَنْفُسًا وَعُقُولَا',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: 'تاريخ\n2026 / 11 / 1'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 794 1123" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="794" height="1123" fill="#0f172a"/>
+            <rect x="0" y="495" width="794" height="130" fill="#f8fafc"/>
+            <rect x="56" y="64" width="682" height="995" fill="#f1f5f9" stroke="#94a3b8" stroke-width="6"/>
+            <rect x="72" y="80" width="650" height="963" fill="none" stroke="#64748b" stroke-width="2.5"/>
+            <circle cx="397" cy="905" r="62" fill="#64748b" stroke="#cbd5e1" stroke-width="4"/>
+          </svg>`,
+        items: [
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شكر وتقدير', x: 197, y: 112, w: 400, fontSize: 76, fontFamily: "'Aref Ruqaa', serif", color: '#475569', fontWeight: '700', scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'لكل من أخلص وأبدع وتفانى في سبيل تحقيق\nحلم طلابنا وأثرى عقولهم بالمعرفة\n\nتتقدم إدارة مرمرة للعلوم واللغات\nبجزيل الشكر والتقدير\nللمعلم الفاضل', x: 105, y: 265, w: 584, fontSize: 31, fontFamily: "'Amiri', serif", color: '#475569', fontWeight: '700', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'أحمد حاج رجب', x: 197, y: 632, w: 400, fontSize: 48, fontFamily: "'Aref Ruqaa', serif", color: '#475569', fontWeight: '700', underline: true, scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'أَعَلِمْتَ أَشْرَفَ أَوْ أَجَلَّ مِنَ الَّذِي    يَبْنِي وَيُنْشِئُ أَنْفُسًا وَعُقُولَا', x: 95, y: 755, w: 604, fontSize: 27, fontFamily: "'Amiri', serif", color: '#475569', fontWeight: '700', scale: 1 },
+          { id: 'logo', type: 'logo', logoMode: 'silver', x: 344, y: 855, w: 106, h: 95, scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: 'المدير : عبدالقادر الخطيب', x: 495, y: 908, fontSize: 18, fontFamily: "'Cairo', sans-serif", color: '#475569', fontWeight: '700', underline: true, scale: 1 },
+          { id: 'sig', type: 'sticker', stickerType: 'managerSig', extraText: '#475569', x: 505, y: 902, w: 140, h: 55, scale: 1 },
+          { id: 'date', role: 'date', type: 'text', text: 'تاريخ\n2026 / 11 / 1', x: 145, y: 895, fontSize: 19, fontFamily: "'Cairo', sans-serif", color: '#475569', fontWeight: '700', underline: true, scale: 1 }
+        ]
+      },
+
+      // 9. شهادة ثناء ولوحة الشرف
+      tpl_thanaa: {
+        id: 'tpl_thanaa',
+        name: 'شهادة ثناء ولوحة الشرف (الكحلي والذهبي)',
+        badge: 'عمودي - لوحة شرف',
+        orientation: 'portrait',
+        defaultFields: {
+          calligraphy: 'ثناء',
+          recipient: 'لشهر 7 نفخر بكم',
+          intro: 'إدارة مرمرة للعلوم واللغات\nوالآنسة آلاء طرقجي\nتثني على جهود طالباتها المتميزات',
+          reason: 'حليمة الشيخ   |   مها تلاوي   |   مروة الخطيب\nرنيم العبدالله   |   سارة قديح   |   إسراء نجار\nهاجر حاج حسن   |   آية الحسين   |   فاطمة بركات\n\nوذلك لمشاركتهم في حل جميع روابط مادة الفيزياء',
+          manager: '«نأمل من باقي طلابنا بذل المزيد من الجهود لنفخر بأسمائهم في الأشهر القادمة»',
+          date: ''
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 794 1123" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="794" height="1123" fill="#0b1320"/>
+            <polygon points="0,0 794,0 794,175 397,265 0,175" fill="#16243b"/>
+            <polygon points="0,175 397,265 794,175 794,225 397,315 0,225" fill="#d4af37"/>
+            <polygon points="365,375 335,435 375,418 392,438" fill="#d4af37"/>
+            <polygon points="429,375 459,435 419,418 402,438" fill="#d4af37"/>
+            <circle cx="397" cy="330" r="66" fill="#ffffff" stroke="#d4af37" stroke-width="6"/>
+            <polygon points="180,1123 397,1045 614,1123" fill="#d4af37"/>
+          </svg>`,
+        items: [
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'ثناء', x: 247, y: 28, w: 300, fontSize: 92, fontFamily: "'Aref Ruqaa', serif", color: '#ffffff', fontWeight: '700', scale: 1 },
+          { id: 'logo', type: 'logo', logoMode: 'gold', x: 342, y: 282, w: 110, h: 96, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'إدارة مرمرة للعلوم واللغات\nوالآنسة آلاء طرقجي\nتثني على جهود طالباتها المتميزات', x: 97, y: 438, w: 600, fontSize: 30, fontFamily: "'Cairo', sans-serif", color: '#ffffff', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'لشهر 7 نفخر بكم', x: 197, y: 575, w: 400, fontSize: 44, fontFamily: "'Cairo', sans-serif", color: '#eab308', fontWeight: '900', scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'حليمة الشيخ   |   مها تلاوي   |   مروة الخطيب\nرنيم العبدالله   |   سارة قديح   |   إسراء نجار\nهاجر حاج حسن   |   آية الحسين   |   فاطمة بركات\n\nوذلك لمشاركتهم في حل جميع روابط مادة الفيزياء', x: 57, y: 675, w: 680, fontSize: 27, fontFamily: "'Cairo', sans-serif", color: '#ffffff', fontWeight: '700', scale: 1 },
+          { id: 'manager', role: 'manager', type: 'text', text: '«نأمل من باقي طلابنا بذل المزيد من الجهود لنفخر بأسمائهم في الأشهر القادمة»', x: 77, y: 1005, w: 640, fontSize: 20, fontFamily: "'Cairo', sans-serif", color: '#eab308', fontWeight: '700', scale: 1 }
+        ]
+      },
+
+      // 10. شكر وتقدير فردي (الأقواس الزرقاء والذهبية)
+      tpl_royal_arches: {
+        id: 'tpl_royal_arches',
+        name: 'شكر وتقدير (الأقواس الزرقاء والذهبية)',
+        badge: 'أفقي - ملكي',
+        orientation: 'landscape',
+        defaultFields: {
+          calligraphy: 'شكر وتقدير',
+          recipient: 'نسيم العمر   -   أحمد خضر الإبراهيم',
+          intro: 'إدارة مرمرة للعلوم واللغات\nتتقدم بالشكر والتقدير لكل من الطالبين',
+          reason: 'لتحقيقهم الدرجات العالية في مادة الفيزياء\nمتمنين لهم الاستمرار في الجد والعمل والتدريب الدائم\nللحفاظ على هذا المستوى المتقدم',
+          manager: 'المدير : عبدالقادر الخطيب',
+          date: '2026'
+        },
+        renderBg: () => `
+          <svg viewBox="0 0 1123 794" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1123" height="794" fill="#f7efe6"/>
+            <path d="M 0,0 L 235,0 Q 85,120 140,245 Q 205,330 0,490 Z" fill="#1e3a8a" stroke="#eab308" stroke-width="8"/>
+            <path d="M 1123,0 L 888,0 Q 1038,120 983,245 Q 918,330 1123,490 Z" fill="#1e3a8a" stroke="#eab308" stroke-width="8"/>
+            <rect x="16" y="16" width="1091" height="762" fill="none" stroke="#0f172a" stroke-width="4"/>
+          </svg>`,
+        items: [
+          { id: 'logo', type: 'logo', logoMode: 'gold', x: 25, y: 28, w: 120, h: 108, scale: 1 },
+          { id: 'calligraphy', role: 'calligraphy', type: 'text', text: 'شكر وتقدير', x: 340, y: 48, w: 440, fontSize: 84, fontFamily: "'Aref Ruqaa', serif", color: '#c59b27', fontWeight: '700', shadow: true, scale: 1 },
+          { id: 'intro', role: 'intro', type: 'text', text: 'إدارة مرمرة للعلوم واللغات\nتتقدم بالشكر والتقدير لكل من الطالبين', x: 211, y: 295, w: 700, fontSize: 38, fontFamily: "'Cairo', sans-serif", color: '#1e293b', fontWeight: '800', scale: 1 },
+          { id: 'recipient', role: 'recipient', type: 'text', text: 'نسيم العمر   -   أحمد خضر الإبراهيم', x: 181, y: 458, w: 760, fontSize: 40, fontFamily: "'Cairo', sans-serif", color: '#1e3a8a', fontWeight: '900', underline: true, scale: 1 },
+          { id: 'reason', role: 'reason', type: 'text', text: 'لتحقيقهم الدرجات العالية في مادة الفيزياء\nمتمنين لهم الاستمرار في الجد والعمل والتدريب الدائم\nللحفاظ على هذا المستوى المتقدم', x: 181, y: 565, w: 760, fontSize: 30, fontFamily: "'Cairo', sans-serif", color: '#1e293b', fontWeight: '800', scale: 1 }
+        ]
+      }
+    };
+
+    /********************************************************************
+     * 3. حالة التطبيق، الحفظ التلقائي المستمر، والتراجع والإعادة
+     ********************************************************************/
+    const STORAGE_KEY = 'MARMARA_CERT_STUDIO_V4';
+    let state = {
+      currentTemplateId: 'tpl_medal_excellence',
+      orientation: 'landscape',
+      zoom: 1,
+      customBgDataUrl: null,
+      customLogoDataUrl: null,
+      templatesState: {}
+    };
+
+    let selectedItemId = null;
+    let historyStack = [];
+    let historyIndex = -1;
+
+    function cloneObj(o) {
+      return JSON.parse(JSON.stringify(o));
+    }
+
+    function initApp() {
+      document.getElementById('miniHeaderLogo').innerHTML = getOriginalMarmaraLogoSVG('original');
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          state = Object.assign(state, parsed);
+        } catch (e) {
+          console.warn('Could not parse saved state', e);
+        }
+      }
+
+      // ضمان تهيئة جميع القوالب بما فيها قالب "وسام التميز" الجديد
+      Object.keys(TEMPLATES_DB).forEach(tplId => {
+        if (!state.templatesState[tplId]) {
+          state.templatesState[tplId] = {
+            orientation: TEMPLATES_DB[tplId].orientation,
+            items: cloneObj(TEMPLATES_DB[tplId].items)
+          };
+        }
+      });
+
+      if (!TEMPLATES_DB[state.currentTemplateId]) {
+        state.currentTemplateId = 'tpl_medal_excellence';
+      }
+
+      buildTemplatesGridUI();
+      loadTemplate(state.currentTemplateId, false);
+      fitCertificateToScreen();
+      pushHistory();
+
+      window.addEventListener('resize', () => {
+        fitCertificateToScreen();
+      });
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const badge = document.getElementById('saveStatusBadge');
+        badge.innerHTML = '● <span>تم الحفظ تلقائياً</span>';
+      } catch (e) {
+        console.warn('Storage quota warning', e);
+      }
+    }
+
+    function pushHistory() {
+      const snap = cloneObj({
+        currentTemplateId: state.currentTemplateId,
+        templatesState: state.templatesState
+      });
+      historyStack = historyStack.slice(0, historyIndex + 1);
+      historyStack.push(snap);
+      if (historyStack.length > 35) historyStack.shift();
+      historyIndex = historyStack.length - 1;
+      updateUndoRedoButtons();
+      saveToStorage();
+    }
+
+    function undoState() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        const snap = cloneObj(historyStack[historyIndex]);
+        state.currentTemplateId = snap.currentTemplateId;
+        state.templatesState = snap.templatesState;
+        renderCertificate();
+        syncQuickInputsFromCanvas();
+        updateUndoRedoButtons();
+        saveToStorage();
+      }
+    }
+
+    function redoState() {
+      if (historyIndex < historyStack.length - 1) {
+        historyIndex++;
+        const snap = cloneObj(historyStack[historyIndex]);
+        state.currentTemplateId = snap.currentTemplateId;
+        state.templatesState = snap.templatesState;
+        renderCertificate();
+        syncQuickInputsFromCanvas();
+        updateUndoRedoButtons();
+        saveToStorage();
+      }
+    }
+
+    function updateUndoRedoButtons() {
+      document.getElementById('undoBtn').disabled = historyIndex <= 0;
+      document.getElementById('redoBtn').disabled = historyIndex >= historyStack.length - 1;
+    }
+
+    /********************************************************************
+     * 4. بناء القوالب، المعاينة، والتحكم المباشر بالسحب واللمس
+     ********************************************************************/
+    function buildTemplatesGridUI() {
+      const grid = document.getElementById('templatesGrid');
+      grid.innerHTML = '';
+      Object.values(TEMPLATES_DB).forEach(tpl => {
+        const card = document.createElement('div');
+        card.className = 'tpl-card' + (state.currentTemplateId === tpl.id ? ' active' : '');
+        card.onclick = () => {
+          loadTemplate(tpl.id, true);
+          if (window.innerWidth <= 768) closeDrawer();
+        };
+        card.innerHTML = `
+          <div class="tpl-thumb" style="background:#fff; color:#0c3144;">
+            <div style="transform:scale(0.11); width:1123px; height:794px; position:absolute; pointer-events:none;">
+              ${tpl.renderBg()}
+            </div>
+            <span style="position:relative; z-index:2; background:rgba(12,49,68,0.85); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px;">${tpl.defaultFields.calligraphy}</span>
+          </div>
+          <div class="tpl-name">${tpl.name}</div>
+          <span class="tpl-badge">${tpl.badge}</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function getCurrentTplData() {
+      return state.templatesState[state.currentTemplateId];
+    }
+
+    function loadTemplate(tplId, recordHistory = true) {
+      state.currentTemplateId = tplId;
+      state.customBgDataUrl = null;
+      selectedItemId = null;
+      hideFloatingInspector();
+      buildTemplatesGridUI();
+      renderCertificate();
+      syncQuickInputsFromCanvas();
+      fitCertificateToScreen();
+      if (recordHistory) pushHistory();
+    }
+
+    function renderCertificate() {
+      const tplDef = TEMPLATES_DB[state.currentTemplateId];
+      const tplState = getCurrentTplData();
+      const canvas = document.getElementById('certificateCanvas');
+
+      canvas.className = 'certificate-canvas ' + tplState.orientation;
+      document.getElementById('btnOrientLand').style.background = tplState.orientation === 'landscape' ? 'var(--teal)' : 'rgba(255,255,255,0.1)';
+      document.getElementById('btnOrientPort').style.background = tplState.orientation === 'portrait' ? 'var(--teal)' : 'rgba(255,255,255,0.1)';
+
+      const bgLayer = document.getElementById('templateBgLayer');
+      if (state.customBgDataUrl) {
+        bgLayer.innerHTML = `<img src="${state.customBgDataUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+      } else {
+        bgLayer.innerHTML = tplDef.renderBg();
+      }
+
+      const layer = document.getElementById('interactiveElementsLayer');
+      layer.innerHTML = '';
+
+      tplState.items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'cert-item' + (item.id === selectedItemId ? ' selected' : '') + (item.locked ? ' locked' : '');
+        el.dataset.id = item.id;
+        el.style.left = item.x + 'px';
+        el.style.top = item.y + 'px';
+        const scaleVal = item.scale || 1;
+        el.style.transform = `scale(${scaleVal})`;
+        el.style.transformOrigin = 'top center';
+
+        if (item.w) el.style.width = item.w + 'px';
+        if (item.h) el.style.height = item.h + 'px';
+
+        if (item.type === 'logo') {
+          el.innerHTML = getOriginalMarmaraLogoSVG(item.logoMode || 'original');
+        } else if (item.type === 'sticker') {
+          el.innerHTML = getStickerSVG(item.stickerType, item.extraText);
+        } else if (item.type === 'pillText') {
+          el.style.background = 'linear-gradient(180deg, #ffffff 0%, #d1d5db 100%)';
+          el.style.border = '3px solid #d4af37';
+          el.style.borderRadius = '14px';
+          el.style.padding = '8px 20px';
+          el.style.textAlign = 'center';
+          el.style.fontFamily = item.fontFamily || "'Cairo', sans-serif";
+          el.style.fontSize = (item.fontSize || 34) + 'px';
+          el.style.fontWeight = item.fontWeight || '800';
+          el.style.color = item.color || '#0c3144';
+          el.style.whiteSpace = 'pre-line';
+          el.textContent = item.text;
+        } else if (item.type === 'goldOvalInput') {
+          // المستطيل البيضاوي الذهبي مع السطر المنقط لاسم الطالب في قالب وسام التميز
+          el.style.background = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)';
+          el.style.border = '4px solid #eab308';
+          el.style.borderRadius = '50px';
+          el.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.08), 0 4px 12px rgba(212,175,55,0.25)';
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
+          el.style.padding = '8px 36px 14px';
+          el.style.fontFamily = item.fontFamily || "'Cairo', sans-serif";
+          el.style.fontSize = (item.fontSize || 38) + 'px';
+          el.style.fontWeight = item.fontWeight || '900';
+          el.style.color = item.color || '#0c3144';
+          el.innerHTML = `
+            <div style="width:100%; text-align:center; border-bottom:3px dotted #0d9488; padding-bottom:4px; pointer-events:none;">
+              ${item.text}
+            </div>`;
+        } else if (item.type === 'navyGoldRibbon') {
+          // الشريط الكحلي والذهبي الثلاثي الأبعاد في قالب وسام التميز
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
+          el.innerHTML = `
+            <svg viewBox="0 0 840 82" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="position:absolute; inset:0; pointer-events:none;">
+              <!-- ذيل الشريط الأيسر والأيمن -->
+              <polygon points="10,20 55,20 45,76 5,76 24,48" fill="#064e63" stroke="#d4af37" stroke-width="2.5"/>
+              <polygon points="830,20 785,20 795,76 835,76 816,48" fill="#064e63" stroke="#d4af37" stroke-width="2.5"/>
+              <!-- جسم الشريط الكحلي الرئيسي -->
+              <polygon points="48,6 792,6 808,38 792,70 48,70 32,38" fill="#042430" stroke="#eab308" stroke-width="4"/>
+            </svg>
+            <span style="position:relative; z-index:2; color:${item.color || '#ffffff'}; font-family:${item.fontFamily || "'Cairo', sans-serif"}; font-size:${(item.fontSize || 30)}px; font-weight:${item.fontWeight || '800'}; text-align:center; pointer-events:none;">
+              ${item.text}
+            </span>`;
+        } else {
+          el.style.textAlign = item.align || 'center';
+          el.style.fontFamily = item.fontFamily || "'Cairo', sans-serif";
+          el.style.fontSize = (item.fontSize || 28) + 'px';
+          el.style.fontWeight = item.fontWeight || '700';
+          el.style.color = item.color || '#0c3144';
+          el.style.lineHeight = '1.45';
+          el.style.whiteSpace = 'pre-line';
+          if (item.underline) {
+            el.style.borderBottom = `3px solid #d4af37`;
+            el.style.paddingBottom = '4px';
+          }
+          if (item.shadow) {
+            el.style.textShadow = '0 3px 6px rgba(0,0,0,0.22)';
+          }
+          if (item.strokeColor) {
+            el.style.webkitTextStroke = `2.5px ${item.strokeColor}`;
+            el.style.paintOrder = 'stroke fill';
+            el.style.filter = 'drop-shadow(0 4px 4px rgba(0,0,0,0.25))';
+          }
+          el.textContent = item.text;
+        }
+
+        const resizeHandle = document.createElement('div');
+        resizeHandle.className = 'resize-handle';
+        resizeHandle.innerHTML = '⤡';
+        el.appendChild(resizeHandle);
+
+        attachDragAndResizeEvents(el, resizeHandle, item);
+        layer.appendChild(el);
+      });
+    }
+
+    let globalMoveMode = false;
+
+    function showCertToast(msg) {
+      const t = document.getElementById('certToast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window._certToastTimer);
+      window._certToastTimer = setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
+
+    function toggleGlobalMoveMode() {
+      globalMoveMode = !globalMoveMode;
+      const btn = document.getElementById('moveModeBtn');
+      if (btn) {
+        if (globalMoveMode) {
+          btn.className = 'hdr-btn mode-move';
+          btn.textContent = '✋ تحريك';
+          showCertToast('✋ وضع التحريك مفعّل — يمكنك الآن سحب النصوص والأشكال بحرية.');
+        } else {
+          btn.className = 'hdr-btn mode-safe';
+          btn.textContent = '🔒 آمن';
+          showCertToast('🔒 الوضع الآمن مفعّل — العناصر مثبتة لمنع التحريك بالخطأ.');
+        }
+      }
+    }
+
+    function centerSelectedHorizontally() {
+      const item = getSelectedItem();
+      if (!item || item.locked) return;
+      const tplState = getCurrentTplData();
+      const certW = tplState.orientation === 'landscape' ? 1123 : 794;
+      const el = document.querySelector('.cert-item[data-id="' + item.id + '"]');
+      const elW = item.w || (el ? el.offsetWidth : 200);
+      item.x = Math.round((certW - elW) / 2);
+      renderCertificate();
+      selectElement(item.id);
+      pushHistory();
+    }
+
+    function attachDragAndResizeEvents(el, resizeHandle, item) {
+      let isDragging = false;
+      let isResizing = false;
+      let startX = 0, startY = 0;
+      let initialX = 0, initialY = 0;
+      let initialScale = 1;
+      let moved = false;
+
+      resizeHandle.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (item.locked || !globalMoveMode) return;
+        selectElement(item.id);
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialScale = item.scale || 1;
+        resizeHandle.setPointerCapture(e.pointerId);
+      });
+
+      resizeHandle.addEventListener('pointermove', (e) => {
+        if (!isResizing) return;
+        const dy = (e.clientY - startY) / state.zoom;
+        const dx = (startX - e.clientX) / state.zoom;
+        const delta = (dx + dy) / 220;
+        item.scale = Math.max(0.3, Math.min(3.5, +(initialScale + delta).toFixed(2)));
+        el.style.transform = `scale(${item.scale})`;
+      });
+
+      resizeHandle.addEventListener('pointerup', () => {
+        if (!isResizing) return;
+        isResizing = false;
+        pushHistory();
+      });
+
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target === resizeHandle) return;
+        e.stopPropagation();
+        selectElement(item.id);
+        if (window.innerWidth <= 768) closeDrawer();
+        // في الوضع الآمن لا يتحرك العنصر بالسحب بالخطأ أبداً، مع تنبيه واضح للمستخدم
+        if (item.locked) {
+          showCertToast('🔒 هذا العنصر مقفل — اضغط أيقونة القفل في الشريط العلوي لفكه.');
+          return;
+        }
+        if (!globalMoveMode) {
+          showCertToast('🔒 التحريك مقفل (الوضع الآمن) — اضغط زر (🔒 آمن) في الأعلى لفك القفل وتحريك العناصر.');
+          return;
+        }
+
+        isDragging = true;
+        moved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialX = item.x;
+        initialY = item.y;
+        el.setPointerCapture(e.pointerId);
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const rawDx = e.clientX - startX;
+        const rawDy = e.clientY - startY;
+        // عتبة 10 بكسل لمنع التحريك بالخطأ عند النقر الخفيف
+        if (!moved && Math.hypot(rawDx, rawDy) < 10) return;
+        moved = true;
+
+        const dx = rawDx / state.zoom;
+        const dy = rawDy / state.zoom;
+        let nextX = Math.round(initialX + dx);
+        const nextY = Math.round(initialY + dy);
+
+        // التقاط مغناطيسي لمنتصف الشهادة
+        const tplState = getCurrentTplData();
+        const certW = tplState.orientation === 'landscape' ? 1123 : 794;
+        const elW = item.w || el.offsetWidth || 0;
+        const centerTargetX = Math.round((certW - elW) / 2);
+        const guide = document.getElementById('centerSnapGuide');
+        if (Math.abs(nextX - centerTargetX) <= 16) {
+          nextX = centerTargetX;
+          if (guide) guide.style.display = 'block';
+        } else {
+          if (guide) guide.style.display = 'none';
+        }
+
+        item.x = nextX;
+        item.y = nextY;
+        el.style.left = item.x + 'px';
+        el.style.top = item.y + 'px';
+      });
+
+      el.addEventListener('pointerup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const guide = document.getElementById('centerSnapGuide');
+        if (guide) guide.style.display = 'none';
+        if (moved) {
+          pushHistory();
+        }
+      });
+
+      el.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        selectElement(item.id);
+        if (isEditableTextType(item)) {
+          openQuickTextModal();
+        }
+      });
+    }
+
+    function isEditableTextType(item) {
+      return (
+        item.type === 'text' ||
+        item.type === 'pillText' ||
+        item.type === 'goldOvalInput' ||
+        item.type === 'navyGoldRibbon' ||
+        item.stickerType === 'gradCap2027'
+      );
+    }
+
+    function selectElement(id) {
+      selectedItemId = id;
+      document.querySelectorAll('.cert-item').forEach(node => {
+        node.classList.toggle('selected', node.dataset.id === id);
+      });
+      const item = getSelectedItem();
+      if (!item) {
+        hideFloatingInspector();
+        return;
+      }
+
+      const inspector = document.getElementById('floatingInspector');
+      inspector.classList.add('visible');
+
+      document.getElementById('btnQuickEditText').style.display = isEditableTextType(item) ? 'flex' : 'none';
+
+      if (item.fontFamily) {
+        document.getElementById('floatingFontSelect').value = item.fontFamily;
+        document.getElementById('fontFamilySelect').value = item.fontFamily;
+      }
+
+      const lockIcon = item.locked ? '🔒' : '🔓';
+      document.getElementById('floatingLockBtn').textContent = lockIcon;
+      document.getElementById('lockBtnDrawer').textContent = item.locked ? '🔓 فك القفل' : '🔒 قفل العنصر';
+    }
+
+    function getSelectedItem() {
+      const tplState = getCurrentTplData();
+      return tplState.items.find(i => i.id === selectedItemId) || null;
+    }
+
+    function hideFloatingInspector() {
+      selectedItemId = null;
+      document.querySelectorAll('.cert-item').forEach(n => n.classList.remove('selected'));
+      document.getElementById('floatingInspector').classList.remove('visible');
+    }
+
+    function handleWorkspaceBackgroundClick(e) {
+      if (e.target.id === 'workspaceArea' || e.target.id === 'certScaler' || e.target.id === 'certificateCanvas') {
+        hideFloatingInspector();
+        if (window.innerWidth <= 768) closeDrawer();
+      }
+    }
+
+    /********************************************************************
+     * 5. وظائف التعديل السريع
+     ********************************************************************/
+    function syncQuickInputsFromCanvas() {
+      const items = getCurrentTplData().items;
+      const findRole = (r) => items.find(i => i.role === r);
+
+      const cal = findRole('calligraphy');
+      if (cal) document.getElementById('calligraphySelect').value = cal.text;
+
+      const rec = findRole('recipient');
+      document.getElementById('inpRecipient').value = rec ? rec.text : '';
+
+      const intro = findRole('intro');
+      document.getElementById('inpIntro').value = intro ? intro.text : '';
+
+      const reason = findRole('reason');
+      document.getElementById('inpReason').value = reason ? reason.text : '';
+
+      const mgr = findRole('manager');
+      document.getElementById('inpManager').value = mgr ? mgr.text : '';
+
+      const dt = findRole('date');
+      document.getElementById('inpDate').value = dt ? dt.text : '';
+    }
+
+    function updateQuickField(role, val) {
+      const items = getCurrentTplData().items;
+      const target = items.find(i => i.role === role);
+      if (target) {
+        target.text = val;
+        renderCertificate();
+        saveToStorage();
+      }
+    }
+
+    function changeCalligraphyType(val) {
+      const items = getCurrentTplData().items;
+      const cal = items.find(i => i.role === 'calligraphy');
+      if (cal) {
+        cal.text = val;
+        renderCertificate();
+        pushHistory();
+      }
+    }
+
+    function openQuickTextModal() {
+      const item = getSelectedItem();
+      if (!item) return;
+      const modal = document.getElementById('quickEditModal');
+      const input = document.getElementById('modalTextInput');
+      input.value = item.stickerType === 'gradCap2027' ? (item.extraText || '2027') : (item.text || '');
+      modal.classList.add('open');
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeQuickTextModal() {
+      document.getElementById('quickEditModal').classList.remove('open');
+    }
+
+    function saveQuickTextModal() {
+      const item = getSelectedItem();
+      if (!item) return;
+      const val = document.getElementById('modalTextInput').value;
+      if (item.stickerType === 'gradCap2027') {
+        item.extraText = val;
+      } else {
+        item.text = val;
+      }
+      closeQuickTextModal();
+      renderCertificate();
+      syncQuickInputsFromCanvas();
+      pushHistory();
+    }
+
+    function scaleSelectedElement(delta) {
+      const item = getSelectedItem();
+      if (!item || item.locked) return;
+      item.scale = Math.max(0.3, Math.min(3.5, +((item.scale || 1) + delta).toFixed(2)));
+      renderCertificate();
+      pushHistory();
+    }
+
+    function setSelectedColor(color) {
+      const item = getSelectedItem();
+      if (!item || item.locked) return;
+      if (item.stickerType === 'managerSig') {
+        item.extraText = color;
+      } else {
+        item.color = color;
+      }
+      renderCertificate();
+      pushHistory();
+    }
+
+    function setSelectedFont(font) {
+      const item = getSelectedItem();
+      if (!item || item.locked) return;
+      item.fontFamily = font;
+      renderCertificate();
+      pushHistory();
+    }
+
+    function nudgeSelected(dx, dy) {
+      const item = getSelectedItem();
+      if (!item || item.locked) return;
+      item.x += dx;
+      item.y += dy;
+      renderCertificate();
+      pushHistory();
+    }
+
+    function toggleLockSelected() {
+      const item = getSelectedItem();
+      if (!item) return;
+      item.locked = !item.locked;
+      renderCertificate();
+      selectElement(item.id);
+      pushHistory();
+    }
+
+    function resetSingleSelected() {
+      if (!selectedItemId) return;
+      const origTpl = TEMPLATES_DB[state.currentTemplateId];
+      const origItem = origTpl.items.find(i => i.id === selectedItemId);
+      if (origItem) {
+        const items = getCurrentTplData().items;
+        const idx = items.findIndex(i => i.id === selectedItemId);
+        if (idx !== -1) {
+          items[idx] = cloneObj(origItem);
+          renderCertificate();
+          syncQuickInputsFromCanvas();
+          selectElement(selectedItemId);
+          pushHistory();
+        }
+      }
+    }
+
+    function deleteSelectedElement() {
+      if (!selectedItemId) return;
+      const item = getSelectedItem();
+      if (item && item.locked) return alert('العنصر مقفل، قم بفك القفل أولاً.');
+      const tplState = getCurrentTplData();
+      tplState.items = tplState.items.filter(i => i.id !== selectedItemId);
+      hideFloatingInspector();
+      renderCertificate();
+      pushHistory();
+    }
+
+    function addNewTextElement() {
+      const tplState = getCurrentTplData();
+      const newId = 'custom_txt_' + Date.now();
+      tplState.items.push({
+        id: newId,
+        type: 'text',
+        text: 'نص جديد قابل للتعديل والتحريك',
+        x: 360,
+        y: 350,
+        fontSize: 32,
+        fontFamily: "'Cairo', sans-serif",
+        color: '#0c3144',
+        fontWeight: '800',
+        scale: 1
+      });
+      renderCertificate();
+      selectElement(newId);
+      pushHistory();
+      if (window.innerWidth <= 768) closeDrawer();
+    }
+
+    function addMovableSticker(stickerType) {
+      const tplState = getCurrentTplData();
+      const newId = 'sticker_' + Date.now();
+      tplState.items.push({
+        id: newId,
+        type: 'sticker',
+        stickerType: stickerType,
+        extraText: stickerType === 'gradCap2027' ? '2027' : '',
+        x: 420,
+        y: 220,
+        w: 220,
+        h: 240,
+        scale: 1
+      });
+      renderCertificate();
+      selectElement(newId);
+      pushHistory();
+      if (window.innerWidth <= 768) closeDrawer();
+    }
+
+    function setOrientation(orient) {
+      const tplState = getCurrentTplData();
+      tplState.orientation = orient;
+      renderCertificate();
+      fitCertificateToScreen();
+      pushHistory();
+    }
+
+    function uploadCustomBg(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        state.customBgDataUrl = ev.target.result;
+        renderCertificate();
+        saveToStorage();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function uploadCustomLogo(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        state.customLogoDataUrl = ev.target.result;
+        document.getElementById('miniHeaderLogo').innerHTML = getOriginalMarmaraLogoSVG('original');
+        renderCertificate();
+        saveToStorage();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function restoreOriginalLogo() {
+      state.customLogoDataUrl = null;
+      document.getElementById('miniHeaderLogo').innerHTML = getOriginalMarmaraLogoSVG('original');
+      renderCertificate();
+      saveToStorage();
+    }
+
+    /********************************************************************
+     * 6. إعادة الضبط، نسخ لطالب آخر، والتحجيم (Zoom A4)
+     ********************************************************************/
+    function confirmResetTemplate() {
+      if (confirm('هل تريد إعادة ضبط القالب الحالي إلى تصميمه الأصلي واستعادة مواقع النصوص والشعار؟')) {
+        const orig = TEMPLATES_DB[state.currentTemplateId];
+        state.templatesState[state.currentTemplateId] = {
+          orientation: orig.orientation,
+          items: cloneObj(orig.items)
+        };
+        state.customBgDataUrl = null;
+        hideFloatingInspector();
+        renderCertificate();
+        syncQuickInputsFromCanvas();
+        fitCertificateToScreen();
+        pushHistory();
+      }
+    }
+
+    function duplicateForNewStudent() {
+      const items = getCurrentTplData().items;
+      const rec = items.find(i => i.role === 'recipient');
+      const newName = prompt('أدخل اسم الطالب / المعلم الجديد لإنشاء شهادته بنفس التصميم:', rec ? rec.text : '');
+      if (newName !== null && newName.trim() !== '') {
+        if (rec) {
+          rec.text = newName.trim();
+          renderCertificate();
+          syncQuickInputsFromCanvas();
+          pushHistory();
+        }
+      }
+    }
+
+    function fitCertificateToScreen() {
+      const workspace = document.getElementById('workspaceArea');
+      if (!workspace) return;
+      const tplState = getCurrentTplData();
+      const certW = tplState.orientation === 'landscape' ? 1123 : 794;
+      const certH = tplState.orientation === 'landscape' ? 794 : 1123;
+
+      const availW = Math.max(180, workspace.clientWidth - 16);
+      const availH = Math.max(180, workspace.clientHeight - 54);
+
+      const scale = Math.min(availW / certW, availH / certH, 1);
+      setZoom(Math.max(0.2, +scale.toFixed(3)));
+    }
+
+    function changeZoom(delta) {
+      setZoom(Math.max(0.24, Math.min(1.6, +(state.zoom + delta).toFixed(2))));
+    }
+
+    function setZoom(z) {
+      state.zoom = z;
+      const scaler = document.getElementById('certScaler');
+      scaler.style.transform = `scale(${z})`;
+      document.getElementById('zoomPercentLabel').textContent = Math.round(z * 100) + '%';
+    }
+
+    /********************************************************************
+     * 7. التحكم بالدرج الجانبي وتصدير الشهادة بجودة طباعة فائقة
+     ********************************************************************/
+    function toggleDrawer(panelName) {
+      const drawer = document.getElementById('sideDrawer');
+      const currentActiveBtn = document.querySelector(`.rail-btn[data-panel="${panelName}"]`);
+      const isAlreadyOpen = drawer.classList.contains('open') && currentActiveBtn.classList.contains('active');
+
+      document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.drawer-section').forEach(s => s.classList.remove('active'));
+
+      if (isAlreadyOpen) {
+        drawer.classList.remove('open');
+        return;
+      }
+
+      currentActiveBtn.classList.add('active');
+      document.getElementById('panel-' + panelName).classList.add('active');
+
+      const titles = {
+        templates: 'القوالب الجاهزة والاتجاه',
+        texts: 'تعديل النصوص السريع',
+        elements: 'إضافة عناصر وشعار المؤسسة',
+        style: 'تنسيق الخط واللون والموقع'
+      };
+      document.getElementById('drawerTitle').textContent = titles[panelName] || '';
+      drawer.classList.add('open');
+    }
+
+    function closeDrawer() {
+      document.getElementById('sideDrawer').classList.remove('open');
+      document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    window._marmaraStudents = [];
+    window._marmaraSections = [];
+    window._marmaraSigImg = '';
+    window._marmaraDirector = '';
+    window._selectedDbStudent = null;
+
+    window.addEventListener('message', function(e) {
+      const d = e && e.data;
+      if (!d || d.type !== 'MARMARA_CONTEXT') return;
+      window._marmaraStudents = d.students || [];
+      window._marmaraSections = d.allowedSections && d.allowedSections.length
+        ? d.allowedSections
+        : [...new Set(window._marmaraStudents.map(s => s.section))];
+      if (d.sigImg) window._marmaraSigImg = d.sigImg;
+      if (d.settings && d.settings['اسم_المدير']) window._marmaraDirector = d.settings['اسم_المدير'];
+      populateDbSections();
+      renderCertificate();
+    });
+
+    function populateDbSections() {
+      const opts = '<option value="">-- اختر الشعبة --</option>' +
+        window._marmaraSections.map(s => '<option value="' + s.replace(/"/g, '&quot;') + '">' + s + '</option>').join('');
+      const s1 = document.getElementById('dbSecSelect');
+      const s2 = document.getElementById('batchSecSelect');
+      if (s1) s1.innerHTML = opts;
+      if (s2) s2.innerHTML = opts;
+    }
+
+    function populateDbStudents() {
+      const sec = document.getElementById('dbSecSelect').value;
+      const sel = document.getElementById('dbStuSelect');
+      if (!sel) return;
+      const list = window._marmaraStudents.filter(s => s.section === sec);
+      sel.innerHTML = '<option value="">-- اختر الطالب (' + list.length + ') --</option>' +
+        list.map(s => '<option value="' + s.id + '">' + s.name + ' (' + s.id + ')</option>').join('');
+    }
+
+    function applyDbStudent(stuId) {
+      const st = window._marmaraStudents.find(s => String(s.id) === String(stuId));
+      window._selectedDbStudent = st || null;
+      if (!st) return;
+      const inpRec = document.getElementById('inpRecipient');
+      if (inpRec) inpRec.value = st.name;
+      updateQuickField('recipient', st.name);
+      if (window._marmaraDirector) {
+        const inpMgr = document.getElementById('inpManager');
+        if (inpMgr) inpMgr.value = 'المدير : ' + window._marmaraDirector;
+        updateQuickField('manager', 'المدير : ' + window._marmaraDirector);
+      }
+      pushHistory();
+    }
+
+    function setPresetReason(txt) {
+      const el = document.getElementById('inpReason');
+      if (el) el.value = txt;
+      updateQuickField('reason', txt);
+      pushHistory();
+    }
+
+    function openBatchModal() {
+      if (!window._marmaraSections.length) {
+        try { window.parent.postMessage({ type: 'MARMARA_REQUEST_CONTEXT' }, '*'); } catch (e) {}
+      }
+      populateDbSections();
+      document.getElementById('batchStudentsBox').innerHTML = '<div style="grid-column:1/-1;color:#94a3b8;font-size:12px;text-align:center;padding:12px;">اختر الشعبة لعرض الطلاب</div>';
+      document.getElementById('batchProgressMsg').textContent = '';
+      document.getElementById('batchPrintModal').classList.add('open');
+    }
+
+    function closeBatchModal() {
+      document.getElementById('batchPrintModal').classList.remove('open');
+    }
+
+    function renderBatchStudentsList() {
+      const sec = document.getElementById('batchSecSelect').value;
+      const box = document.getElementById('batchStudentsBox');
+      const list = window._marmaraStudents.filter(s => s.section === sec);
+      if (!list.length) {
+        box.innerHTML = '<div style="grid-column:1/-1;color:#94a3b8;font-size:12px;text-align:center;padding:12px;">لا يوجد طلاب في هذه الشعبة</div>';
+        return;
+      }
+      box.innerHTML = list.map(s => (
+        '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#f8fafc;background:rgba(255,255,255,0.06);padding:5px 7px;border-radius:6px;cursor:pointer;">' +
+          '<input type="checkbox" class="batchStuCheck" value="' + s.id + '" checked> ' + s.name +
+        '</label>'
+      )).join('');
+    }
+
+    let _batchMode = 'sec';
+
+    function switchBatchMode(m) {
+      _batchMode = m;
+      document.getElementById('batchPane_sec').style.display = (m === 'sec') ? 'flex' : 'none';
+      document.getElementById('batchPane_excel').style.display = (m === 'excel') ? 'flex' : 'none';
+      document.getElementById('batchTabBtn_sec').style.background = (m === 'sec') ? 'var(--teal)' : 'rgba(255,255,255,0.1)';
+      document.getElementById('batchTabBtn_excel').style.background = (m === 'excel') ? 'var(--teal)' : 'rgba(255,255,255,0.1)';
+    }
+
+    function requestTopStudentsForBatch() {
+      const sec = document.getElementById('batchSecSelect').value;
+      if (!sec) {
+        showCertToast('اختر الشعبة أولاً لاستخراج أوائلها.');
+        return;
+      }
+      document.getElementById('batchProgressMsg').textContent = '⏳ جاري استخراج أوائل الشعبة من السجل...';
+      try {
+        window.parent.postMessage({ type: 'MARMARA_GET_TOP_STUDENTS', section: sec, limit: 5 }, '*');
+      } catch (e) {}
+    }
+
+    window.addEventListener('message', function(e) {
+      const d = e && e.data;
+      if (!d || d.type !== 'MARMARA_TOP_STUDENTS_RESULT') return;
+      const topIds = new Set((d.students || []).map(s => String(s.id)));
+      document.querySelectorAll('.batchStuCheck').forEach(cb => {
+        cb.checked = topIds.has(String(cb.value));
+      });
+      const names = (d.students || []).map((s, idx) => (idx + 1) + '. ' + s.name + ' (' + s.avgPct + '%)').join(' | ');
+      document.getElementById('batchProgressMsg').textContent = names
+        ? ('🏅 الأوائل: ' + names)
+        : 'لا توجد درجات مرصودة لهذه الشعبة في الشهر الحالي.';
+    });
+
+    function toggleAllBatchChecks(flag) {
+      document.querySelectorAll('.batchStuCheck').forEach(cb => cb.checked = flag);
+    }
+
+    async function runBatchPrint() {
+      const entries = [];
+      if (_batchMode === 'excel') {
+        const raw = document.getElementById('batchExcelTextarea').value || '';
+        raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
+          const parts = line.split(/\t|\||;/).map(p => p.trim());
+          if (parts[0]) entries.push({ name: parts[0], reason: parts[1] || '' });
+        });
+      } else {
+        const checkedIds = [...document.querySelectorAll('.batchStuCheck:checked')].map(c => c.value);
+        checkedIds.forEach(cid => {
+          const st = window._marmaraStudents.find(s => String(s.id) === String(cid));
+          if (st) entries.push({ name: st.name, reason: '' });
+        });
+      }
+
+      if (!entries.length) {
+        alert('يرجى تحديد طالب واحد على الأقل أو لصق الأسماء من Excel.');
+        return;
+      }
+      const btn = document.getElementById('btnRunBatchPrint');
+      const msg = document.getElementById('batchProgressMsg');
+      btn.disabled = true;
+
+      const tplState = getCurrentTplData();
+      const recItem = tplState.items.find(i => i.role === 'recipient');
+      const reasonItem = tplState.items.find(i => i.role === 'reason');
+      const origText = recItem ? recItem.text : '';
+      const origReason = reasonItem ? reasonItem.text : '';
+      const orient = tplState.orientation || 'landscape';
+
+      const canvasEl = document.getElementById('certificateCanvas');
+      const scalerEl = document.getElementById('certScaler');
+      const prevTransform = scalerEl.style.transform;
+      hideFloatingInspector();
+      canvasEl.classList.add('exporting');
+      scalerEl.style.transform = 'scale(1)';
+
+      const images = [];
+      try {
+        for (let idx = 0; idx < entries.length; idx++) {
+          const item = entries[idx];
+          msg.textContent = '⏳ جاري تجهيز شهادة (' + (idx + 1) + ' / ' + entries.length + '): ' + item.name;
+          if (recItem) recItem.text = item.name;
+          if (reasonItem && item.reason) reasonItem.text = item.reason;
+          else if (reasonItem) reasonItem.text = origReason;
+          renderCertificate();
+          await new Promise(r => setTimeout(r, 90));
+          const c = await html2canvas(canvasEl, { scale: 1.8, useCORS: true, backgroundColor: '#ffffff' });
+          images.push({ name: item.name, url: c.toDataURL('image/png') });
+        }
+
+        const win = window.open('', '_blank');
+        if (!win) {
+          alert('يرجى السماح بالنوافذ المنبثقة (Pop-ups) لفتح صفحة الطباعة الجماعية.');
+        } else {
+          const pagesHtml = images.map(im => '<div class="p"><img src="' + im.url + '"></div>').join('');
+          win.document.write(
+            '<!DOCTYPE html><html dir="rtl"><head><title>طباعة الشهادات الجماعية</title>' +
+            '<style>@page{size:A4 ' + orient + ';margin:0}body{margin:0;background:#fff}.p{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;page-break-after:always;break-after:page}.p:last-child{page-break-after:auto}img{max-width:100%;max-height:100%;object-fit:contain}</style>' +
+            '</head><body>' + pagesHtml + '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script></body></html>'
+          );
+          win.document.close();
+        }
+        msg.textContent = '✅ تم تجهيز ' + images.length + ' شهادة للطباعة بنجاح!';
+      } catch (err) {
+        alert('حدث خطأ أثناء التجهيز الجماعي: ' + err.message);
+      } finally {
+        if (recItem) recItem.text = origText;
+        if (reasonItem) reasonItem.text = origReason;
+        renderCertificate();
+        scalerEl.style.transform = prevTransform;
+        canvasEl.classList.remove('exporting');
+        btn.disabled = false;
+      }
+    }
+
+    async function exportCertificate(shareViaWhatsapp) {
+      hideFloatingInspector();
+      closeDrawer();
+
+      const canvasEl = document.getElementById('certificateCanvas');
+      const scalerEl = document.getElementById('certScaler');
+      const prevTransform = scalerEl.style.transform;
+
+      canvasEl.classList.add('exporting');
+      scalerEl.style.transform = 'scale(1)';
+
+      await new Promise(r => setTimeout(r, 120));
+
+      try {
+        const renderedCanvas = await html2canvas(canvasEl, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+
+        const recItem = getCurrentTplData().items.find(i => i.role === 'recipient');
+        const calItem = getCurrentTplData().items.find(i => i.role === 'calligraphy');
+        const studentName = recItem ? recItem.text.trim() : 'طالب';
+        const cleanName = studentName.replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+        const fileName = 'شهادة_مرمرة_' + (cleanName || 'جديدة') + '.png';
+        const dataUrl = renderedCanvas.toDataURL('image/png', 1.0);
+
+        // توثيق الشهادة تلقائياً في سجل المكرمين
+        try {
+          window.parent.postMessage({
+            type: 'MARMARA_LOG_HONOR',
+            record: {
+              type: calItem ? calItem.text : 'شهادة تقدير',
+              studentId: window._selectedDbStudent ? window._selectedDbStudent.id : '',
+              studentName: studentName,
+              section: window._selectedDbStudent ? window._selectedDbStudent.section : '',
+              details: TEMPLATES_DB[state.currentTemplateId] ? TEMPLATES_DB[state.currentTemplateId].name : ''
+            }
+          }, '*');
+        } catch (e) {}
+
+        if (shareViaWhatsapp && window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'MARMARA_SHARE_IMAGE',
+            dataUrl: dataUrl,
+            studentName: studentName,
+            phone: window._selectedDbStudent ? window._selectedDbStudent.whatsapp : '',
+            fileName: fileName,
+            customMsg: 'تبارك مؤسسة مرمرة التعليمية - مدرسة مرمرة الخاصة للطالب/ة (' + studentName + ') حصوله/ا على (' + (calItem ? calItem.text : 'شهادة تقدير') + ')، متمنين له/ا دوام التفوق والنجاح.'
+          }, '*');
+        } else {
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = dataUrl;
+          link.click();
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء تصدير الشهادة، يرجى المحاولة مرة أخرى.');
+        console.error(err);
+      } finally {
+        scalerEl.style.transform = prevTransform;
+        canvasEl.classList.remove('exporting');
+      }
+    }
+
+    // طلب بيانات الطلاب عند تحميل الإطار
+    try { window.parent.postMessage({ type: 'MARMARA_REQUEST_CONTEXT' }, '*'); } catch (e) {}
+
+    
+    // التكبير والتصغير والتحريك بأصبعين على الشهادة بالكامل
+    (function initCertWorkspacePinch() {
+      const ws = document.getElementById('workspaceArea');
+      if (!ws) return;
+      let pDist = 0, pZoom = 1, lastMidX = 0, lastMidY = 0;
+      const dist = (t1, t2) => Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+
+      ws.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          pDist = dist(e.touches[0], e.touches[1]);
+          pZoom = state.zoom;
+          lastMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          lastMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        }
+      }, { passive: true });
+
+      ws.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && pDist > 0) {
+          e.preventDefault();
+          const curDist = dist(e.touches[0], e.touches[1]);
+          const nextZ = Math.max(0.24, Math.min(1.8, +(pZoom * (curDist / pDist)).toFixed(2)));
+          setZoom(nextZ);
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          ws.scrollLeft -= (midX - lastMidX);
+          ws.scrollTop -= (midY - lastMidY);
+          lastMidX = midX;
+          lastMidY = midY;
+        }
+      }, { passive: false });
+
+      ws.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) pDist = 0;
+      }, { passive: true });
+    })();
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
