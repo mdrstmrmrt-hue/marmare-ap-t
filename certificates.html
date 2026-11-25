@@ -2856,15 +2856,26 @@
           }, '*');
         } catch (e) {}
 
+        const shareMsgText = 'تبارك مؤسسة مرمرة التعليمية - مدرسة مرمرة الخاصة للطالب/ة (' + studentName + ') حصوله/ا على (' + (calItem ? calItem.text : 'شهادة تقدير') + ')، متمنين له/ا دوام التفوق والنجاح.';
+        const stuPhone = window._selectedDbStudent ? String(window._selectedDbStudent.whatsapp || '').replace(/[^0-9]/g, '') : '';
         if (shareViaWhatsapp && window.parent && window.parent !== window) {
           window.parent.postMessage({
             type: 'MARMARA_SHARE_IMAGE',
             dataUrl: dataUrl,
             studentName: studentName,
-            phone: window._selectedDbStudent ? window._selectedDbStudent.whatsapp : '',
+            phone: stuPhone,
             fileName: fileName,
-            customMsg: 'تبارك مؤسسة مرمرة التعليمية - مدرسة مرمرة الخاصة للطالب/ة (' + studentName + ') حصوله/ا على (' + (calItem ? calItem.text : 'شهادة تقدير') + ')، متمنين له/ا دوام التفوق والنجاح.'
+            customMsg: shareMsgText
           }, '*');
+        } else if (shareViaWhatsapp) {
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = dataUrl;
+          link.click();
+          const waHref = stuPhone
+            ? ('https://wa.me/' + stuPhone + '?text=' + encodeURIComponent(shareMsgText))
+            : ('https://wa.me/?text=' + encodeURIComponent(shareMsgText));
+          window.open(waHref, '_blank');
         } else {
           const link = document.createElement('a');
           link.download = fileName;
@@ -2880,7 +2891,22 @@
       }
     }
 
-    // طلب بيانات الطلاب عند تحميل الإطار
+    // طلب بيانات الطلاب عند تحميل الإطار مع قراءة احتياطية من ذاكرة المتصفح على GitHub Pages
+    try {
+      const bootRaw = window.localStorage.getItem('marmara_boot_cache');
+      if (bootRaw) {
+        const d = JSON.parse(bootRaw);
+        if (d && Array.isArray(d.students)) {
+          window._marmaraStudents = d.students.filter(s => s.status === 'نشط');
+          window._marmaraSections = (d.allowedSections && d.allowedSections.length)
+            ? d.allowedSections
+            : [...new Set(window._marmaraStudents.map(s => s.section))];
+          if (d.settings && d.settings['توقيع_المدير']) window._marmaraSigImg = d.settings['توقيع_المدير'];
+          if (d.settings && d.settings['اسم_المدير']) window._marmaraDirector = d.settings['اسم_المدير'];
+          populateDbSections();
+        }
+      }
+    } catch (e) {}
     try { window.parent.postMessage({ type: 'MARMARA_REQUEST_CONTEXT' }, '*'); } catch (e) {}
 
     
