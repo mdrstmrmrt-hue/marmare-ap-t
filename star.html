@@ -3098,15 +3098,28 @@
                     }, '*');
                 } catch (e) {}
 
+                const starMsgText = '🌟 تبارك مدرسة مرمرة الخاصة للطالب/ة (' + studentName + ') حصوله/ا على لقب نجم الأسبوع (نجم مرمرة) عن جدارة واستحقاق!';
+                const starPhone = selectedStarStudent ? String(selectedStarStudent.whatsapp || '').replace(/[^0-9]/g, '') : '';
                 if (shareViaWhatsapp && window.parent && window.parent !== window) {
                     window.parent.postMessage({
                         type: 'MARMARA_SHARE_IMAGE',
                         dataUrl: dataUrl,
                         studentName: studentName,
-                        phone: selectedStarStudent ? selectedStarStudent.whatsapp : '',
+                        phone: starPhone,
                         fileName: fileName,
-                        customMsg: '🌟 تبارك مدرسة مرمرة الخاصة للطالب/ة (' + studentName + ') حصوله/ا على لقب نجم الأسبوع (نجم مرمرة) عن جدارة واستحقاق!'
+                        customMsg: starMsgText
                     }, '*');
+                } else if (shareViaWhatsapp) {
+                    const link = document.createElement('a');
+                    link.download = fileName;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    const waHref = starPhone
+                        ? ('https://wa.me/' + starPhone + '?text=' + encodeURIComponent(starMsgText))
+                        : ('https://wa.me/?text=' + encodeURIComponent(starMsgText));
+                    window.open(waHref, '_blank');
                 } else {
                     const link = document.createElement('a');
                     link.download = fileName;
@@ -3289,6 +3302,22 @@
                 });
             }
 
+            try {
+                const bootRaw = window.localStorage.getItem('marmara_boot_cache');
+                if (bootRaw) {
+                    const d = JSON.parse(bootRaw);
+                    if (d && Array.isArray(d.students)) {
+                        starDbStudents = d.students.filter(s => s.status === 'نشط');
+                        starDbSections = (d.allowedSections && d.allowedSections.length)
+                            ? d.allowedSections
+                            : [...new Set(starDbStudents.map(s => s.section))];
+                        if (starDbSecSelect && starDbSections.length) {
+                            starDbSecSelect.innerHTML = '<option value="">-- اختر الشعبة --</option>' +
+                                starDbSections.map(s => '<option value="' + s.replace(/"/g, '&quot;') + '">' + s + '</option>').join('');
+                        }
+                    }
+                }
+            } catch (e) {}
             try { window.parent.postMessage({ type: 'MARMARA_REQUEST_CONTEXT' }, '*'); } catch (e) {}
 
             // Advanced Custom Template Assets Accordion
